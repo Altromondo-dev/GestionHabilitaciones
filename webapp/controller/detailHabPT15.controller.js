@@ -457,17 +457,17 @@ sap.ui.define([
                     .User[0]
                     .roles
                     .some(r =>
-                        r.includes("seguridadH_PT15") || // Seguridad e Higiene
-                        r.includes("SegHigiene") || // Seguridad e Higiene
-                        r.includes("Auditor_Externo") || // Auditor Externo
-                        r.includes("Aud_Externo_PT15") || // Auditor Externo
+                        r.includes("HAB_PT15_SEG-HIG") || // Seguridad e Higiene
+                        r.includes("HAB_PT15_SEG-HIG") || // Seguridad e Higiene
+                        r.includes("HAB_PT15_AUD-EXTERNO") || // Auditor Externo
+                        r.includes("HAB_PT15_AUD-EXTERNO") || // Auditor Externo
                         r.includes("Director_Tecnico") || // Director Técnico
-                        r.includes("Rep_Direccion_PT15") || // Representante de la Dirección 
-                        r.includes("Gestion_Calidad_PT15") || // Gestión de la Calidad
-                        r.includes("Ger_Operaciones") || // Gerencia de Planificación y Operación de la Red
-                        r.includes("Ger_Reg_Jefe_COT") || // Gerente Regional / Jefe COT 
-                        r.includes("PT15_GerRegional") || // Gerente Regional / Jefe COT 
-                        r.includes("Examinadores_PT15") || // Las tres personas designadas como Equipo Examinador			
+                        r.includes("HAB_PT15_REP-DIRECCION") || // Representante de la Dirección 
+                        r.includes("HAB_PT15_GEST-CALIDAD") || // Gestión de la Calidad
+                        r.includes("HAB_PT15_GER-OPERACION") || // Gerencia de Planificación y Operación de la Red
+                        r.includes("HAB_PT15_GER-REG-JEFE-COT") || // Gerente Regional / Jefe COT 
+                        r.includes("HAB_PT15_GER-REG") || // Gerente Regional / Jefe COT 
+                        r.includes("HAB_PT15_EXAMINADORES") || // Las tres personas designadas como Equipo Examinador			
                         r === "Examinador1" || // Las tres personas designadas como Equipo Examinador
                         r === "Examinador2" || // Las tres personas designadas como Equipo Examinador
                         r === "Examinador3" // Las tres personas designadas como Equipo Examinador
@@ -603,7 +603,7 @@ sap.ui.define([
                     oDataModel.Examinador3_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Examinador3_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Examinador3_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
-                } else if (roles.includes("Ger_Reg_Jefe_COT")) {
+                } else if (roles.includes("HAB_PT15_GER-REG-JEFE-COT")) {
                     oDataModel.Gerente_Reg_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Gerente_Reg_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Gerente_Reg_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
@@ -634,7 +634,7 @@ sap.ui.define([
                             oDataModel.Gerente_Reg_Cantidad_Venc = DiasGerReg;
                         }
                     }
-                } else if (roles.includes("Ger_Operaciones")) {
+                } else if (roles.includes("HAB_PT15_GER-OPERACION")) {
                     oDataModel.Ger_Operaciones_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Ger_Operaciones_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Ger_Operaciones_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
@@ -667,18 +667,18 @@ sap.ui.define([
                             oDataModel.Ger_Operaciones_Cantidad_Venc = DiasGerOp;
                         }
                     }
-                } else if (roles.includes("Gestion_Calidad_PT152")) {
+                } else if (roles.includes("HAB_PT15_GEST-CALIDAD")) {
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Gestion_Calidad_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Gestion_Calidad_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Gestion_Calidad_Fecha_Habilitacion = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
                     oDataModel.ObservacionGestionCalidad = Intervenciones[row].Datosadicionales;
-                } else if (roles.includes("Rep_Direccion_PT15")) {
+                } else if (roles.includes("HAB_PT15_REP-DIRECCION")) {
                     oDataModel.Rep_Direccion_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Rep_Direccion_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Rep_Direccion_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Rep_Direccion_Observacion = Intervenciones[row].Datosadicionales;
-                } else if (roles.includes("Direccion_TecnicaPT15")) {
+                } else if (roles.includes("HAB_PT15_DIREC-TECNICA")) {
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Direccion_Tecnica_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Direccion_Tecnica_Nombre = Intervenciones[row].Nombre;
@@ -765,7 +765,7 @@ sap.ui.define([
             var EstadoActual = this.getView().getModel("Habilitacion").getData().Estado;
             //se fija si dentro de los roles tiene Director tecnico
             var bRolesAutorizados = Roles.some(function (elem) {
-                return elem === "Direccion_TecnicaPT15" || elem === "Director_Tecnico";
+                return elem === "HAB_PT15_DIREC-TECNICA" || elem === "Director_Tecnico";
             });
             if (bRolesAutorizados) {
                 //Si es habilitado
@@ -867,7 +867,7 @@ sap.ui.define([
             var habilitacion = this.getView().getModel("Habilitacion").getData();
             var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
             var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "Direccion_TecnicaMTO");
+            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "HAB_PT15_DIREC-TECNICA");
             var data = {
                 Apellido: habilitacion.Apellido,
                 Area: habilitacion.Area,
@@ -954,7 +954,7 @@ sap.ui.define([
             oModel.setProperty("/Busy", true);
             var oHabilitacion = this.getView().getModel("Habilitacion").getData();
             var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "Direccion_TecnicaPT15");
+            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "HAB_PT15_DIREC-TECNICA");
             var filters = {
                 "Id": oHabilitacion.Idhabilitacion,
                 "Empresa": oHabilitacion.Empresa === "TRANSENER" ? "100" : "300",
@@ -985,7 +985,7 @@ sap.ui.define([
             }
             if (rol) {
                 if (
-                    rol.includes("Direccion_TecnicaPT15") ||
+                    rol.includes("HAB_PT15_DIREC-TECNICA") ||
                     rol.includes("Director_Tecnico")
                 ) {
                     return true;
@@ -999,7 +999,7 @@ sap.ui.define([
         onEnableRol2: function (rol) {
             if (rol) {
                 if (
-                    rol.includes("Direccion_TecnicaPT15") ||
+                    rol.includes("HAB_PT15_DIREC-TECNICA") ||
                     rol.includes("Director_Tecnico")
                 ) {
                     return true;
@@ -1014,7 +1014,7 @@ sap.ui.define([
             if (estado === 'C' || estado === 'D' || estado === 'F' || estado === 'N') {
                 return false;
             } else {
-                if (rol.includes('MedicinaLaboral_PT15') || rol.includes('Medicina_Laboral')) {
+                if (rol.includes('HAB_PT15_MED-LABORAL') || rol.includes('HAB_PT15_MED-LABORAL')) {
                     return true;
                 } else {
                     return false;
@@ -1027,7 +1027,7 @@ sap.ui.define([
             var habilitacion = this.getView().getModel("Habilitacion").getData();
             var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
             var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "Direccion_TecnicaMTO");
+            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "HAB_PT15_MED-LABORAL");
             var estadoNuevo = habilitacion.Estado;
             if (oModel.oData.Gradoap === "A" || oModel.oData.Gradoap === "B" || oModel.oData.Gradoap === "C") {
                 if (habilitacion.Estado !== 'S' && habilitacion.Estado !== 'D') {
@@ -1134,7 +1134,7 @@ sap.ui.define([
                         "Nombre": Files[row].name,
                         "Archivo": Files[row].binary,
                         "Doctype": Files[row].type,
-                        "Rol": "MedicinaLaboral_PT15", //rolId,
+                        "Rol": "HAB_PT15_MED-LABORAL", //rolId,
                         "Idadjuntos": Idadjuntos
                     };
                     AdjuntosServices.SaveAdjunto(oFileDate);
@@ -1199,7 +1199,7 @@ sap.ui.define([
         RolFormatter: function (rol) {
             if (rol.includes("Director_Tecnico")) {
                 return "Director Técnico";
-            } else if (rol.includes("Direccion_TecnicaPT15")) {
+            } else if (rol.includes("HAB_PT15_MED-LABORAL")) {
                 return "Director Técnico";
             } else {
                 return rol;

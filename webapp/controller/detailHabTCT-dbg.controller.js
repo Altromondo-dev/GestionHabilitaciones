@@ -417,11 +417,11 @@ sap.ui.define([
 			}, 1000);*/
 			for (var row in Intervenciones) {
 				var roles = Intervenciones[row].Rol;
-				if (roles.includes("Habilitado_TCT")) {
+				if (roles.includes("HAB_TCT_HABILITADO")) {
 					oDataModel.Habilitado_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
 					oDataModel.Habilitado_Nombre = Intervenciones[row].Nombre;
 					oDataModel.Habilitado_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-				} else if (roles.includes("TCT_Supervisor")) {
+				} else if (roles.includes("HAB_TCT_SUPERVISOR")) {
 					oDataModel.Capacitacion_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
 					oDataModel.Capacitacion_Nombre = Intervenciones[row].Nombre;
 					if (sModel.Hab_CETCT_nav.length > 0) {
@@ -433,14 +433,14 @@ sap.ui.define([
 					}
 					//Esto ya no se usa, lo comento 3/8/2022
 					//this.LoadTipoHabModel(oDataModel.Clase, oDataModel.Tension);
-				} else if (roles.includes("TCT_MedLaboral")) {
+				} else if (roles.includes("HAB_TCT_MED-LABORAL")) {
 					oDataModel.Medico_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
 					oDataModel.Medico_Observacion = Intervenciones[row].Datosadicionales;
 					if (sModel.Hab_apmedico_nav.length > 0) {
 						oDataModel.Medico_Fecha = FormatHelper.formatJsonDate(sModel.Hab_apmedico_nav[0].Vigencia);
 						oDataModel.Grado_aptitud = sModel.Hab_apmedico_nav[0].Gradoap;
 					}
-				} else if (roles.includes("TCT_SegHigiene")) {
+				} else if (roles.includes("HAB_TCT_SEG-HIG")) {
 					oDataModel.Seg_higiene_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
 					oDataModel.Seg_higiene_Observacion = Intervenciones[row].Datosadicionales;
 					//ISSUE 263 - TcT Seguridad e Higiene, Fecha de vencimiento.
@@ -448,7 +448,7 @@ sap.ui.define([
 					if (sModel.Hab_SeguridadHigiene_nav.length > 0) {
 						oDataModel.Seg_higiene_Fecha = FormatHelper.formatJsonDate(sModel.Hab_SeguridadHigiene_nav[0].Vigencia);
 					}
-				} else if (roles.includes("TCT_GerRegional")) {
+				} else if (roles.includes("HAB_TCT_GER-REG")) {
 					oDataModel.Gerente_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
 					oDataModel.Gerente_Fecha = FormatHelper.formatJsonDate(sModel.Vigencia);
 					oDataModel.Gerente_Nombre = Intervenciones[row].Nombre;
@@ -518,7 +518,7 @@ sap.ui.define([
 			}
 		},
 		formatterClase: function (rol, estado) {
-			if (rol.includes("TCT_Supervisor") && estado === 'H') { //Si es supervisor_TCT y el estado es "Habilitado"
+			if (rol.includes("HAB_TCT_SUPERVISOR") && estado === 'H') { //Si es supervisor_TCT y el estado es "Habilitado"
 				return true;
 			} else {
 				return false;
@@ -616,7 +616,7 @@ sap.ui.define([
 			var EstadoActual = this.getView().getModel("Habilitacion").getData().Estado;
 			//se fija si dentro de los roles tiene Supervisor o Gerente Regional
 			var bRolEsDirectorTecnico = Roles.some(function (elem) {
-				return elem === "TCT_Supervisor" || elem === "TCT_GerRegional";
+				return elem === "HAB_TCT_SUPERVISOR" || elem === "HAB_TCT_GER-REG";
 			});
 			if (bRolEsDirectorTecnico) {
 				if (EstadoActual === "H") { //Si es habilitado
@@ -724,7 +724,7 @@ sap.ui.define([
 			var Lote = oModel.getData().Lote ? oModel.getData().Lote : habilitacion.Lote;
 			var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
 			var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-			var Rol = Roles.find(element => element === "TCT_Supervisor" || element === "TCT_GerRegional");
+			var Rol = Roles.find(element => element === "HAB_TCT_SUPERVISOR" || element === "HAB_TCT_GER-REG");
 			var data = {
 				Apellido: habilitacion.Apellido,
 				Area: habilitacion.Area,
@@ -811,7 +811,7 @@ sap.ui.define([
 			oModel.setProperty("/Busy", true);
 			var oHabilitacion = this.getView().getModel("Habilitacion").getData();
 			var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-			var Rol = Roles.find(element => element === "TCT_Supervisor" || element === "TCT_GerRegional");
+			var Rol = Roles.find(element => element === "HAB_TCT_SUPERVISOR" || element === "HAB_TCT_GER-REG");
 			var filters = {
 				"Id": oHabilitacion.Idhabilitacion,
 				"Empresa": oHabilitacion.Empresa === "TRANSENER" ? "100" : "300",
@@ -842,8 +842,8 @@ sap.ui.define([
 			}
 			if (rol) {
 				if (
-					rol.includes("TCT_GerRegional") ||
-					rol.includes("TCT_Supervisor")
+					rol.includes("HAB_TCT_GER-REG") ||
+					rol.includes("HAB_TCT_SUPERVISOR")
 				) {
 					return true;
 				} else {
@@ -977,8 +977,8 @@ sap.ui.define([
 			if (rol) {
 				if (
 					rol.includes("Director_Tecnico") ||
-					rol.includes("TCT_GerRegional") ||
-					rol.includes("TCT_Supervisor")
+					rol.includes("HAB_TCT_GER-REG") ||
+					rol.includes("HAB_TCT_SUPERVISOR")
 				) {
 					return true;
 				} else {
@@ -1136,7 +1136,7 @@ sap.ui.define([
 			}
 			if (rol) {
 				if (
-					rol.includes("TCT_Supervisor")
+					rol.includes("HAB_TCT_SUPERVISOR")
 				) {
 					return true;
 				} else {
@@ -1207,7 +1207,7 @@ sap.ui.define([
 				"Idhabilitacion": oHab.Idhabilitacion,
 				"Legajo": oHab.Interno ? oHab.Legajo : oHab.Documento,
 				"Nombre": "",
-				"Rol": "TCT_Supervisor",
+				"Rol": "HAB_TCT_SUPERVISOR",
 				"Usuario": ""
 			};
 			IntervencionesServices.SaveIntervenciones(data,
@@ -1233,7 +1233,7 @@ sap.ui.define([
 						"Nombre": Files[row].name,
 						"Archivo": Files[row].binary,
 						"Doctype": Files[row].type,
-						"Rol": "TCT_Supervisor",
+						"Rol": "HAB_TCT_SUPERVISOR",
 						"Idadjuntos": Idadjuntos,
 						"Complementario": true
 					};
@@ -1285,7 +1285,7 @@ sap.ui.define([
 		},
 		SaveAttachmentVisibility: function (rol) {
 			if (rol) {
-				if (rol.includes("TCT_Supervisor")) {
+				if (rol.includes("HAB_TCT_SUPERVISOR")) {
 					return true;
 				} else {
 					return false;
@@ -1320,9 +1320,9 @@ sap.ui.define([
 			}
 		},
 		RolFormatter: function (rol) {
-			if (rol.includes("TCT_Supervisor")) {
+			if (rol.includes("HAB_TCT_SUPERVISOR")) {
 				return "Supervisor";
-			} else if (rol.includes("TCT_GerRegional")) {
+			} else if (rol.includes("HAB_TCT_GER-REG")) {
 				return "Gerente Regional";
 			} else {
 				return rol;

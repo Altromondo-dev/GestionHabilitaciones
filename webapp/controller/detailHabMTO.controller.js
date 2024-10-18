@@ -229,15 +229,15 @@ sap.ui.define([
                 var Roles = aModelRoles.getData().groups;
                 if (Roles.includes("Mantenimiento_Solicitante")) {
                     EditableCommentsModel.setProperty("/editMode_solicitante", true);
-                } else if (Roles.includes("Mantenimiento_SegHigiene")) {
+                } else if (Roles.includes("HAB_MTO_SEG-HIG")) {
                     EditableCommentsModel.setProperty("/editMode_segHigiene", true);
-                } else if (Roles.includes("Mantenimiento_SegPublica")) {
+                } else if (Roles.includes("HAB_MTO_SEG-PUB")) {
                     EditableCommentsModel.setProperty("/editMode_segPublica", true);
-                } else if (Roles.includes("Mantenimiento_GerRegional")) {
+                } else if (Roles.includes("HAB_MTO_GER-REG")) {
                     EditableCommentsModel.setProperty("/editMode_gerRegional", true);
-                } else if (Roles.includes("Mantenimiento_Capacitacion")) {
+                } else if (Roles.includes("HAB_MTO_CAPACITACION")) {
                     EditableCommentsModel.setProperty("/editMode_capacitacion", true);
-                } else if (Roles.includes("Mantenimiento_Secretaria")) {
+                } else if (Roles.includes("HAB_MTO_SECRETARIA")) {
                     EditableCommentsModel.setProperty("/editMode_secretaria", true);
                 }
             }, 300);
@@ -389,7 +389,7 @@ sap.ui.define([
         // Habilitar o no funcionalidad de adjunto por rol
         SaveAttachmentVisibility: function (rol) {
             if (rol) {
-                var found = rol.find(element => element.match("Mantenimiento_Secretaria_"));
+                var found = rol.find(element => element.match("HAB_MTO_SECRETARIA"));
                 if (found) {
                     return true;
                 } else {
@@ -416,25 +416,25 @@ sap.ui.define([
                     oDataModel.Solicitante_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
                     oDataModel.Solicitante_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Solicitante_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                } else if (roles.includes("Mantenimiento_SegHigiene")) {
+                } else if (roles.includes("HAB_MTO_SEG-HIG")) {
                     oDataModel.SegHigiene_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
                     oDataModel.SegHigiene_Nombre = Intervenciones[row].Nombre;
                     oDataModel.SegHigiene_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                } else if (roles.includes("Mantenimiento_SegPublica")) {
+                } else if (roles.includes("HAB_MTO_SEG-PUB")) {
                     oDataModel.SegPublica_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
                     oDataModel.SegPublica_Nombre = Intervenciones[row].Nombre;
                     oDataModel.SegPublica_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                } else if (roles.includes("Mantenimiento_GerRegional")) {
+                } else if (roles.includes("HAB_MTO_GER-REG")) {
                     var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.GerRegional_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
                     oDataModel.GerRegional_Nombre = Intervenciones[row].Nombre;
                     oDataModel.GerRegional_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.GerRegional_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
-                } else if (roles.includes("Mantenimiento_Capacitacion")) {
+                } else if (roles.includes("HAB_MTO_CAPACITACION")) {
                     oDataModel.Capacitacion_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
                     oDataModel.Capacitacion_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Capacitacion_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                } else if (roles.includes("Mantenimiento_Secretaria")) {
+                } else if (roles.includes("HAB_MTO_SECRETARIA")) {
                     //punto 1
                     if (Intervenciones[row].Legajo !== '00000000') {
                         oDataModel.Secretaria_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
@@ -456,13 +456,13 @@ sap.ui.define([
             if (!rol) return false;
             if (rol.includes("Mantenimiento_Solicitante")) {
                 return section === 'SolicitanteMto';
-            } else if (rol.includes("Mantenimiento_SegHigiene")) {
+            } else if (rol.includes("HAB_MTO_SEG-HIG")) {
                 return section === 'SegHigiene';
-            } else if (rol.includes("Mantenimiento_SegPublica")) {
+            } else if (rol.includes("HAB_MTO_SEG-PUB")) {
                 return section === 'SegPublica';
-            } else if (rol.includes("Mantenimiento_GerRegional")) {
+            } else if (rol.includes("HAB_MTO_GER-REG")) {
                 return section === 'GerRegional';
-            } else if (rol.includes("Mantenimiento_Capacitacion")) {
+            } else if (rol.includes("HAB_MTO_CAPACITACION")) {
                 return section === 'cap_entrenamiento';
             }
             return false;
@@ -473,8 +473,8 @@ sap.ui.define([
             }
             if (rol) {
                 if (
-                    rol.includes("Mantenimiento_Secretaria_" + habArea) ||
-                    rol.includes("Mantenimiento_GerRegional_" + habArea)
+                    rol.includes("HAB_MTO_SECRETARIA" + habArea) ||
+                    rol.includes("HAB_MTO_GER-REG" + habArea)
                 ) {
                     return true;
                 } else {
@@ -504,7 +504,7 @@ sap.ui.define([
                     "Nombre": file.name,
                     "Archivo": btoa(reader.result),
                     "Doctype": file.type,
-                    "Rol": "Mantenimiento_Secretaria",
+                    "Rol": "HAB_MTO_SECRETARIA",
                     "Idadjuntos": ''
                 };
                 oModel.getData().Files.push(adjunto);
@@ -531,7 +531,7 @@ sap.ui.define([
                 "Idhabilitacion": habilitacion.Idhabilitacion,
                 "Clasehab": "H0001",
                 "Fechacreacion": new Date(),
-                "Rol": "Mantenimiento_Secretaria",
+                "Rol": "HAB_MTO_SECRETARIA",
                 "Fechaint": date,
                 "Horaint": time,
                 "Accion": "",
@@ -567,7 +567,7 @@ sap.ui.define([
             var EstadoActual = this.getView().getModel("Habilitacion").getData().Estado;
             //se fija si dentro de los roles tiene Secretaria o Gerente Regional
             var bRolesAutorizados = Roles.some(function (elem) {
-                return elem === "Mantenimiento_Secretaria" || elem === "Mantenimiento_GerRegional";
+                return elem === "HAB_MTO_SECRETARIA" || elem === "HAB_MTO_GER-REG";
             });
             if (bRolesAutorizados) {
                 if (EstadoActual === "H") { //Si es habilitado
@@ -674,7 +674,7 @@ sap.ui.define([
             var habilitacion = this.getView().getModel("Habilitacion").getData();
             var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
             var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-            var Rol = Roles.find(element => element === "Mantenimiento_Secretaria" || element === "Mantenimiento_GerRegional");
+            var Rol = Roles.find(element => element === "HAB_MTO_SECRETARIA" || element === "HAB_MTO_GER-REG");
             var data = {
                 Apellido: habilitacion.Apellido,
                 Area: habilitacion.Area,
@@ -768,7 +768,7 @@ sap.ui.define([
             oModel.setProperty("/Busy", true);
             var oHabilitacion = this.getView().getModel("Habilitacion").getData();
             var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-            var Rol = Roles.find(element => element === "Mantenimiento_Secretaria" || element === "Mantenimiento_GerRegional");
+            var Rol = Roles.find(element => element === "HAB_MTO_SECRETARIA" || element === "HAB_MTO_GER-REG");
             var filters = {
                 "Id": oHabilitacion.Idhabilitacion,
                 "Empresa": oHabilitacion.Empresa === "TRANSENER" ? "100" : "300",
@@ -804,21 +804,21 @@ sap.ui.define([
             if (Roles.includes("Mantenimiento_Solicitante")) {
                 comment = this.getView().getModel("SendCommentModel").getData().ConformidadAgenteComment;
                 UserCurrentRol = "Mantenimiento_Solicitante";
-            } else if (Roles.includes("Mantenimiento_SegHigiene")) {
+            } else if (Roles.includes("HAB_MTO_SEG-HIG")) {
                 comment = this.getView().getModel("SendCommentModel").getData().SeguridadHigieneComment;
-                UserCurrentRol = "Mantenimiento_SegHigiene";
-            } else if (Roles.includes("Mantenimiento_SegPublica")) {
+                UserCurrentRol = "HAB_MTO_SEG-HIG";
+            } else if (Roles.includes("HAB_MTO_SEG-PUB")) {
                 comment = this.getView().getModel("SendCommentModel").getData().SegPublicaComment;
-                UserCurrentRol = "Mantenimiento_SegPublica";
-            } else if (Roles.includes("Mantenimiento_GerRegional")) {
+                UserCurrentRol = "HAB_MTO_SEG-PUB";
+            } else if (Roles.includes("HAB_MTO_GER-REG")) {
                 comment = this.getView().getModel("SendCommentModel").getData().ConfGerReg;
-                UserCurrentRol = "Mantenimiento_GerRegional";
-            } else if (Roles.includes("Mantenimiento_Capacitacion")) {
+                UserCurrentRol = "HAB_MTO_GER-REG";
+            } else if (Roles.includes("HAB_MTO_CAPACITACION")) {
                 comment = this.getView().getModel("SendCommentModel").getData().CapaYEntrenamComment;
-                UserCurrentRol = "Mantenimiento_Capacitacion";
-            } else if (Roles.includes("Mantenimiento_Secretaria")) {
+                UserCurrentRol = "HAB_MTO_CAPACITACION";
+            } else if (Roles.includes("HAB_MTO_SECRETARIA")) {
                 comment = this.getView().getModel("SendCommentModel").getData().SecretGerenciComment;
-                UserCurrentRol = "Mantenimiento_Secretaria";
+                UserCurrentRol = "HAB_MTO_SECRETARIA";
             }
             var SaveCommentsPayload = {
                 "Idhabilitacion": oContexto.Idhabilitacion,
@@ -866,22 +866,22 @@ sap.ui.define([
             //Al obtener los comentarios del servicio, se lo asigno al modelo de envio de comentarios para que muestre en el textArea los comentarios ya guardados
             var allCommentsGeted = data.results;
             var oCapaYEntrenamComment = allCommentsGeted.find(comment => {
-                return comment.Rol.includes("Mantenimiento_Capacitacion");
+                return comment.Rol.includes("HAB_MTO_CAPACITACION");
             });
             var oSecretGerenciComment = allCommentsGeted.find(comment => {
-                return comment.Rol.includes("Mantenimiento_Secretaria");
+                return comment.Rol.includes("HAB_MTO_SECRETARIA");
             });
             var oConformidadAgenteComment = allCommentsGeted.find(comment => {
                 return comment.Rol.includes("Mantenimiento_Solicitante");
             });
             var oConfGerReg = allCommentsGeted.find(comment => {
-                return comment.Rol.includes("Mantenimiento_GerRegional");
+                return comment.Rol.includes("HAB_MTO_GER-REG");
             });
             var oSeguridadHigieneComment = allCommentsGeted.find(comment => {
-                return comment.Rol.includes("Mantenimiento_SegHigiene");
+                return comment.Rol.includes("HAB_MTO_SEG-HIG");
             });
             var oSegPublicaComment = allCommentsGeted.find(comment => {
-                return comment.Rol.includes("Mantenimiento_SegPublica");
+                return comment.Rol.includes("HAB_MTO_SEG-PUB");
             });
             //Le seteo al modelo de enviar el comentario q ya esta guardado en el servicio para cada rol
             this.getView().getModel("SendCommentModel").getData().CapaYEntrenamComment = oCapaYEntrenamComment === undefined ? '' :
@@ -907,15 +907,15 @@ sap.ui.define([
         RolFormatter: function (rol) {
             if (rol.includes("Mantenimiento_Solicitante")) {
                 return "Conformidad del Agente";
-            } else if (rol.includes("Mantenimiento_Capacitacion")) {
+            } else if (rol.includes("HAB_MTO_CAPACITACION")) {
                 return "Capacitacion";
-            } else if (rol.includes("Mantenimiento_SegHigiene")) {
+            } else if (rol.includes("HAB_MTO_SEG-HIG")) {
                 return "Seguridad e Higiene";
-            } else if (rol.includes("Mantenimiento_SegPublica")) {
+            } else if (rol.includes("HAB_MTO_SEG-PUB")) {
                 return "Seguridad Pública";
-            } else if (rol.includes("Mantenimiento_Secretaria")) {
+            } else if (rol.includes("HAB_MTO_SECRETARIA")) {
                 return "Secretaría";
-            } else if (rol.includes("Mantenimiento_GerRegional")) {
+            } else if (rol.includes("HAB_MTO_GER-REG")) {
                 return "Gerente Regional";
             } else {
                 return rol;
