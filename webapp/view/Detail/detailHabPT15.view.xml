@@ -57,7 +57,7 @@
 																	<f:fields>
 																		<ComboBox selectedKey="{Habilitacion>/Tipohab}" editable="false" items="{Funciones>/Funciones}">
 																			<items>
-																				<core:Item key="{Funciones>Codigo}" text="{Funciones>Funcion}"/>
+																				<core:Item key="{Funciones>Tipohab}" text="{Funciones>Descripcion}"/>
 																			</items>
 																		</ComboBox>
 																	</f:fields>
@@ -315,21 +315,21 @@
 																</f:FormElement>
 																<f:FormElement>
 																	<f:label>
-																		<Label text="{i18n>Fecha}" visible="{HabilitacionModel>/aptoMedicoVisible}"/>
+																		<Label text="{i18n>Fecha}"/>
 																	</f:label>
 																	<f:fields>
-																		<DatePicker editable="false" visible="{HabilitacionModel>/aptoMedicoVisible}" dateValue="{HabilitacionModel>/Medicina_Fecha}"
+																		<DatePicker editable="false" dateValue="{HabilitacionModel>/Medicina_Fecha}"
 																			displayFormat="dd/MM/yyyy"/>
-																		<Label text="{i18n>Aclaracion}:" visible="{HabilitacionModel>/aptoMedicoVisible}" class="topLabel TextEnd"/>
-																		<Input editable="false" type="Text" visible="{HabilitacionModel>/aptoMedicoVisible}" value="{HabilitacionModel>/Medicina_Nombre}"/>
+																		<Label text="{i18n>Aclaracion}:" class="topLabel TextEnd"/>
+																		<Input editable="false" type="Text" value="{HabilitacionModel>/Medicina_Nombre}"/>
 																	</f:fields>
 																</f:FormElement>
 																<f:FormElement>
 																	<f:label>
-																		<Label text="{i18n>Firma}" visible="{HabilitacionModel>/aptoMedicoVisible}"/>
+																		<Label text="{i18n>Firma}"/>
 																	</f:label>
 																	<f:fields>
-																		<Image class="signatureBackground" src="{HabilitacionModel>/Medicina_Firma}" visible="{HabilitacionModel>/aptoMedicoVisible}" height="70px" width="200px"
+																		<Image class="signatureBackground" src="{HabilitacionModel>/Medicina_Firma}" height="70px" width="200px"
 																			densityAware="false"/>
 																	</f:fields>
 																</f:FormElement>
@@ -713,7 +713,7 @@
 												</f:Form>
 											</items>
 										</VBox>
-										<VBox class="colorGray sapUiSmallMarginTop">
+										<!-- <VBox class="colorGray sapUiSmallMarginTop">
 											<items>
 												<f:Form editable="true">
 													<f:layout>
@@ -815,7 +815,7 @@
 													</f:formContainers>
 												</f:Form>
 											</items>
-										</VBox>
+										</VBox> -->
 										<VBox class="colorGray sapUiSmallMarginTop">
 											<items>
 												<f:Form editable="true">
@@ -836,24 +836,28 @@
 																		<TextArea value="{HabilitacionModel>/ObservacionGestionCalidad}" rows="3" editable="false" cols="110" maxLength="0"/>
 																	</f:fields>
 																</f:FormElement>
-																<f:FormElement>
+																<f:FormElement label="{i18n>fechaGc}">
 																	<f:fields>
-																		<Label text="{i18n>fechaGc}:" wrapping="true" class="TextEnd topLabel">
-																			<layoutData>
-																				<l:GridData span="XL3 L3 M3 S12"/>
-																			</layoutData>
-																		</Label>
 																		<DatePicker displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Gestion_Calidad_Fecha_Habilitacion}" editable="false">
 																			<layoutData>
 																				<l:GridData span="XL3 L3 M3 S12"/>
 																			</layoutData>
 																		</DatePicker>
-																		<Label text="{i18n>Aclaracion}:" class="topLabel TextEnd">
+																	</f:fields>
+																</f:FormElement>
+																<f:FormElement label="{i18n>Fecha}">
+																	<f:fields>
+																		<DatePicker displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Gestion_Calidad_Fecha}" editable="false">
+																			<layoutData>
+																				<l:GridData span="XL3 L3 M3 S12"/>
+																			</layoutData>
+																		</DatePicker>
+																		<Label text="{i18n>Aclaracion}:" textAlign="End" class="topLabel">
 																			<layoutData>
 																				<l:GridData span="XL3 L3 M3 S12"/>
 																			</layoutData>
 																		</Label>
-																		<Input type="Text" value="{HabilitacionModel>/Gestion_Calidad_Nombre}" editable="false">
+																		<Input type="Text" editable="false" value="{HabilitacionModel>/Gestion_Calidad_Nombre}">
 																			<layoutData>
 																				<l:GridData span="XL3 L3 M3 S12"/>
 																			</layoutData>

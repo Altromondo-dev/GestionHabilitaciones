@@ -16,7 +16,6 @@ sap.ui.define([
     "transener/GestionHabilitaciones/services/TareasTCTService",
     "transener/GestionHabilitaciones/services/GestionTareasTCTService",
     "transener/GestionHabilitaciones/services/TipoHabilitacionServices",
-    "transener/GestionHabilitaciones/services/UserService",
     "transener/GestionHabilitaciones/services/PuestosServices",
     "transener/GestionHabilitaciones/services/FirmasUsuariosServices",
     "transener/GestionHabilitaciones/services/AdjuntosServices",
@@ -26,7 +25,7 @@ sap.ui.define([
 ], function (Controller, MessageBox, NavigationHelper, FormatHelper, FileDownloadHelper, MessageBoxHelper,
     PrintAndDownloadHelper, IntervencionesServices, HabilitacionServices, RegionServices, HabTecnicasService,
     EstacionesServices, TareasTCTService, GestionTareasTCTService, TipoHabilitacionServices,
-    UserService, PuestosServices, FirmasUsuariosServices, AdjuntosServices, MotivoCambioEstadoService, PersonalInternoServices,ComentariosHabilitacionesService) {
+    PuestosServices, FirmasUsuariosServices, AdjuntosServices, MotivoCambioEstadoService, PersonalInternoServices,ComentariosHabilitacionesService) {
     "use strict";
     return Controller.extend("transener.GestionHabilitaciones.controller.detailHabTCT", {
         getBaseURL: function () {
@@ -55,8 +54,6 @@ sap.ui.define([
         onInit: function () {
 
             // var cUrl = this.getBaseURL();
-            UserService.getUser();
-            // this.getUser();
             this.loadHabilitacionModel();
             this.loadGradoAptitud();
             this.loadStatusOptionsModel();

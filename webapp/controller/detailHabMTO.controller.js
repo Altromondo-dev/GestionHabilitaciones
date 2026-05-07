@@ -15,13 +15,12 @@ sap.ui.define([
     "transener/GestionHabilitaciones/services/IntervencionesServices",
     "transener/GestionHabilitaciones/services/HabilitacionServices",
     "transener/GestionHabilitaciones/services/HabTecnicasService",
-    "transener/GestionHabilitaciones/services/UserService",
     "transener/GestionHabilitaciones/services/ComentariosHabilitacionesService",
     "transener/GestionHabilitaciones/services/MotivoCambioEstadoService",
     "transener/GestionHabilitaciones/services/AdjuntosServices"
 ], function (Controller, MessageBox, NavigationHelper, FormatHelper, MessageBoxHelper, FileDownloadHelper,
     PrintAndDownloadHelper, AppManagementHelper, PersonalInternoServices, RegionServices, FirmasUsuariosServices, IntervencionesServices,
-    HabilitacionServices, HabTecnicasService, UserService, ComentariosHabilitacionesService,
+    HabilitacionServices, HabTecnicasService, ComentariosHabilitacionesService,
     MotivoCambioEstadoService, AdjuntosServices) {
     "use strict";
     return Controller.extend("transener.GestionHabilitaciones.controller.detailHabMTO", {
@@ -51,8 +50,6 @@ sap.ui.define([
             this.createTaskModel();
             //Modelos de ajuntos y comentarios
             this.loadHabilitacionModel();
-            //Obtengo info del usuario que se loguea a la app
-            UserService.getUser();
             //Modelo con los estados de la habilitación
             this.loadStatusOptionsModel();
             //Modelo para envio de comentarios

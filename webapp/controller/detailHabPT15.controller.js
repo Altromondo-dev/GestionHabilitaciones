@@ -14,28 +14,40 @@ sap.ui.define([
     "transener/GestionHabilitaciones/services/HabTecnicasService",
     "transener/GestionHabilitaciones/services/ComentariosHabilitacionesService",
     "transener/GestionHabilitaciones/services/FirmasUsuariosServices",
-    "transener/GestionHabilitaciones/services/UserService",
     "transener/GestionHabilitaciones/services/AdjuntosServices",
-    "transener/GestionHabilitaciones/services/MotivoCambioEstadoService"
+    "transener/GestionHabilitaciones/services/MotivoCambioEstadoService",
+    "transener/GestionHabilitaciones/services/TipoHabilitacionServices"
 ], function (MessageBox, Controller, NavigationHelper, FormatHelper, FileDownloadHelper, MessageBoxHelper, PrintAndDownloadHelper,
     IntervencionesServices, HabilitacionServices, RegionServices, HabTecnicasService, ComentariosHabilitacionesService,
-    FirmasUsuariosServices, UserService, AdjuntosServices, MotivoCambioEstadoService) {
+    FirmasUsuariosServices, AdjuntosServices, MotivoCambioEstadoService, TipoHabilitacionServices) {
     "use strict";
     return Controller.extend("transener.GestionHabilitaciones.controller.detailHabPT15", {
      
 
         onInit: function () {
 
-           
-            this.getUser();
+
             //	this.loadUserModel();
-          //  this.loadFuncionesModel();
+            this.loadFuncionesModel();
             this.loadHabilitacionModel();
             this.loadGradoAptitud();
             this.loadStatusOptionsModel();
             this.loadFileModel();
             this.loadFirma();
             this.createSendCommentModel();
+            this.createModelRecursively();
+        },
+        createModelRecursively: function () {
+            var that = this;
+            if (sap.ui.getCore().getModel("UserJsonModel") === undefined) {
+                setTimeout(function () {
+                    that.createModelRecursively();
+                }, 300);
+            } else {
+                var data = sap.ui.getCore().getModel("UserJsonModel").getData();
+                var UserJsonModelVISTA = new sap.ui.model.json.JSONModel(data);
+                that.getView().setModel(UserJsonModelVISTA, "UserJsonModelVISTA");
+            }
         },
         onTabSelect: function (oEvent) {
             let sSelectedKey = oEvent.getSource().getSelectedKey();
@@ -47,211 +59,15 @@ sap.ui.define([
             }
         },
 
-        loadUserModel: function (callback) {
-          
-            var UserDataService = this;
-            this.callback = callback;
-            //reads user api
-            /* var path = this._servicePathPrefix + this._servicePath;
-            jQuery.ajax(path + "?multiValuesAsArrays=true", {
-                method: "GET",
-                success: jQuery.proxy(UserDataService.onReadUserApiSuccess, UserDataService),
-                error: jQuery.proxy(UserDataService.onReadUserApiError, UserDataService)
-            });
-            */
-            const url = sap.ui.getCore().getModel("appCurrentInfo").appUrl + "/user-api/currentUser";
-            var oModel = new sap.ui.model.json.JSONModel();
-            var mock = {
-                firstname: "Dummy",
-                lastname: "User",
-                email: "dummy.user@com",
-                name: "dummy.user@com",
-                displayName: "Dummy User (dummy.user@com)",
-                groups: ["Mantenimiento_GerRegional",
-                    "Examinadores_PT15",
-                    "Selector_evaluadores_PT15",
-                    "seguridadH_PT15",
-                    "Rep_Direccion_PT15",
-                    "MedicinaLaboral_PT15",
-                    "Gestion_Calidad_PT152",
-                    "Direccion_TecnicaPT15",
-                    "Auditor_Externo",
-                    "Gestion_habilitaciones",
-                    "Solicitante_PT15",
-                    "Mantenimiento_Secretaria",
-                    "Director_Tecnico",
-                    "Ger_Operaciones",
-                    "Aprobacion_Habilitaciones"
-                ]
-            };
-
-            oModel.loadData(url);
+        loadFuncionesModel: function () {
             var that = this;
-            oModel.dataLoaded()
-                .then(() => {
-                    //check if data has been loaded
-                    //for local testing, set mock data
-                    if (oModel.getData().email) {
-
-                        var cUrl = sap.ui.getCore().getModel("appCurrentInfo").appUrl + '/IAS/scim/Users?filter=emails.value eq "' + oModel.getData().email + '"'
-
-                        //Llamar a API del IAS
-                        $.ajax({
-
-                            type: "GET",
-                            contentType: "application/scim+json",
-                            url: cUrl,
-                            xhrFields: { withCredentials: false },
-                            dataType: "json",
-                            async: false,
-
-                            success: function (data, textStatus, jqXHR) {
-
-                                //window.alert("success");
-                                console.log("It works");
-                                var oModelUser = new sap.ui.model.json.JSONModel();
-                                oModelUser.setData(data.Resources);
-
-                            
-                                var aDatosUsuario = that.armarDatos(data.Resources);
-
-                                oModel.setData(aDatosUsuario);
-                                sap.ui.getCore().setModel(oModel, "UserDataModel");
-                                //								oView.getView().setModel(oModel, "users");
-
-                            },
-                            error: function (data, xhr, textStatus) {
-                                console.log(data);
-                                console.log(xhr);
-                                console.log(textStatus);
-                          
-                                window.alert("error");
-                            }
-                        });
-                        // Fin llamar a API del IAS
-                    }
-                    else {
-                        oModel.setData(mock);
-                    }
-                    // this.setModel(oModel, "userInfo");
-                })
-                .catch(() => {
-                    oModel.setData(mock);
+            TipoHabilitacionServices.loadTipoHab(function (data) {
+                var oModel = new sap.ui.model.json.JSONModel({
+                    Funciones: data.results
                 });
+                that.getView().setModel(oModel, "Funciones");
+            }, function () {});
         },
-
-        armarDatos: function (datos) {
-
-      
-
-            var aGroupsTemporal = datos[0].corporateGroups ? datos[0].corporateGroups : datos[0].groups;
-
-            var aGroups = aGroupsTemporal.map(function (fila) {
-                return fila.display;
-            });
-
-            var aUserData = {
-                firstname: datos[0].displayName,
-                lastname: datos[0].displayName,
-                email: datos[0].emails[0].value,
-                name: datos[0].emails[0].value,
-                displayName: datos[0].displayName,
-                groups: aGroups
-            };
-            return aUserData;
-        },
-
-        getUser: function (successCallback, errorCallback) {
-            /*	
-            var path = this._servicePathPrefix + this._servicePath + "?multiValuesAsArrays=true";
-            jQuery.ajax(path, {
-                method: "GET",
-                success: successCallback,
-                error: errorCallback
-            });
-            */
-
-            const url = sap.ui.getCore().getModel("appCurrentInfo").appUrl + "/user-api/currentUser";
-
-            var oModel = new sap.ui.model.json.JSONModel();
-            var mock = {
-                firstname: "Dummy",
-                lastname: "User",
-                email: "dummy.user@com",
-                name: "dummy.user@com",
-                displayName: "Dummy User (dummy.user@com)",
-                groups: ["Mantenimiento_GerRegional",
-                    "Examinadores_PT15",
-                    "Selector_evaluadores_PT15",
-                    "seguridadH_PT15",
-                    "Rep_Direccion_PT15",
-                    "MedicinaLaboral_PT15",
-                    "Gestion_Calidad_PT152",
-                    "Direccion_TecnicaPT15",
-                    "Auditor_Externo",
-                    "Gestion_habilitaciones",
-                    "Solicitante_PT15",
-                    "Mantenimiento_Secretaria",
-                    "Director_Tecnico",
-                    "Ger_Operaciones",
-                    "Aprobacion_Habilitaciones"
-                ]
-            };
-
-            oModel.loadData(url);
-            var that = this;
-            oModel.dataLoaded()
-                .then(() => {
-                    //check if data has been loaded
-                    //for local testing, set mock data
-                    if (oModel.getData().email) {
-
-                        var cUrl = sap.ui.getCore().getModel("appCurrentInfo").appUrl + '/IAS/scim/Users?filter=emails.value eq "' + oModel.getData().email + '"'
-
-                        //Llamar a API del IAS
-                        $.ajax({
-
-                            type: "GET",
-                            contentType: "application/scim+json",
-                            url: cUrl,
-                            xhrFields: { withCredentials: false },
-                            dataType: "json",
-                            async: false,
-
-                            success: function (data, textStatus, jqXHR) {
-
-                                //window.alert("success");
-                                console.log("It works");
-                                var oModelUser = new sap.ui.model.json.JSONModel();
-                                oModelUser.setData(data.Resources);
-
-                           
-                                var aDatosUsuario = that.armarDatos(data.Resources);
-
-                                oModel.setData(aDatosUsuario);
-                                //								oView.getView().setModel(oModel, "users");
-                                sap.ui.getCore().setModel(oModel, "UserJsonModel");
-                            },
-                            error: function (data, xhr, textStatus) {
-                                console.log(data);
-                                console.log(xhr);
-                                console.log(textStatus);
-                         
-                                window.alert("error");
-                            }
-                        });
-                        // Fin llamar a API del IAS
-                    }
-                    else {
-                        oModel.setData(mock);
-                    }
-                    // this.setModel(oModel, "userInfo");  
-                })
-                .catch(() => {
-                    oModel.setData(mock);
-                });
-        },
-
         loadHabilitacionModel: function () {
             var oModel = new sap.ui.model.json.JSONModel();
             oModel.setProperty("/Busy", true);
@@ -517,18 +333,14 @@ sap.ui.define([
                     oDataModel.Capacitador_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Capacitador_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                 } else if (roles.includes("MedicinaLaboral_PT15")) {
-                    if (Habilitacion.Hab_apmedico_nav) {
-                        if (ValidateAptoMedico === false && Habilitacion.Hab_apmedico_nav.length > 0) {
-                            oDataModel.aptoMedicoVisible = false;
-                            oDataModel.Gradoap = Habilitacion.Hab_apmedico_nav[0].Gradoap;
-                            oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
-                        } else if (ValidateAptoMedico === true && Habilitacion.Hab_apmedico_nav.length > 0) {
-                            oDataModel.Medicina_Firma = "data:image/gif;base64," + Intervenciones[row].Firma;
-                            oDataModel.Medicina_Nombre = Intervenciones[row].Nombre;
-                            oDataModel.Medicina_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                            oDataModel.Gradoap = Habilitacion.Hab_apmedico_nav[0].Gradoap;
-                            oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
-                        }
+                    oDataModel.Medicina_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    oDataModel.Medicina_Nombre = Intervenciones[row].Nombre;
+                    oDataModel.Medicina_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
+                    oDataModel.aptoMedicoVisible = true;
+                    ValidateAptoMedico = true;
+                    if (Habilitacion.Hab_apmedico_nav && Habilitacion.Hab_apmedico_nav.length > 0) {
+                        oDataModel.Gradoap = Habilitacion.Hab_apmedico_nav[0].Gradoap;
+                        oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
                     }
                     /*	oDataModel.Medicina_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                         oDataModel.Medicina_Nombre = Intervenciones[row].Nombre;
@@ -660,6 +472,7 @@ sap.ui.define([
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Gestion_Calidad_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Gestion_Calidad_Nombre = Intervenciones[row].Nombre;
+                    oDataModel.Gestion_Calidad_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Gestion_Calidad_Fecha_Habilitacion = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
                     oDataModel.ObservacionGestionCalidad = Intervenciones[row].Datosadicionales;
                 } else if (roles.includes("Rep_Direccion_PT15")) {
@@ -673,15 +486,15 @@ sap.ui.define([
                     oDataModel.Direccion_Tecnica_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Direccion_Tecnica_Fecha_Vigencia = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
                     oDataModel.Direccion_Tecnica_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
+                    oDataModel.Direccion_Tecnica_Observacion = Intervenciones[row].Datosadicionales;
                 }
             }
-            /*var Habilitacion = this.getView().getModel("Habilitacion").getData();
-            if (ValidateAptoMedico === false && Habilitacion.Hab_apmedico_nav.length > 0) {
+            if (ValidateAptoMedico === false && Habilitacion.Hab_apmedico_nav && Habilitacion.Hab_apmedico_nav.length > 0) {
                 oDataModel.aptoMedicoVisible = false;
                 oDataModel.Gradoap = Habilitacion.Hab_apmedico_nav[0].Gradoap;
                 oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
                 oDataModel.Medicina_Fecha_vencimiento_old = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
-            }*/
+            }
             var oModel = this.getView().getModel("HabilitacionModel");
             oModel.updateBindings(true);
             oModel.setProperty("/Busy", false);
@@ -907,7 +720,9 @@ sap.ui.define([
         onSuccessCallbackStatus: function () {
             HabTecnicasService.LoadHabilitaciones(
                 jQuery.proxy(this.successCallbackList, this),
-                jQuery.proxy(this.errorCallbackList, this)
+                jQuery.proxy(this.errorCallbackList, this),
+                [],
+                "/HabTecnicas2PT15Set"
             );
         },
         onErrorCallbackStatus: function (data) {
@@ -1000,6 +815,9 @@ sap.ui.define([
             }
         },
         onEnableRol3: function (rol, estado) {
+            if (!rol) {
+                return false;
+            }
             if (estado === 'C' || estado === 'D' || estado === 'F' || estado === 'N') {
                 return false;
             } else {

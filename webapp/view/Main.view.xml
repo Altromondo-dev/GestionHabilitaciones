@@ -405,9 +405,10 @@
                                 <Text
                                     text="{path: 'Habilitaciones>VigenciaDate', formatter: '.formatFechas'}"
                                     visible="{path: 'Habilitaciones>Estado', formatter: '.formatVisibilityVigencia'}"/>
+                                <!-- FechaCreacion debe mostrarse siempre; no usar formatVisibilityVigencia acá -->
                                 <Text
-                                    text="{path: 'Habilitaciones>FechaCreacion', formatter: '.formatFechas'}"
-                                    visible="{path: 'Habilitaciones>Estado', formatter: '.formatVisibilityVigencia'}"/>
+                                 text="{path: 'Habilitaciones>FechaCreacion', formatter: '.formatFechas'}"/>
+
                                 <Text text="{path: 'Habilitaciones>VtoApto', formatter: '.formatFechas'}"/>
                             </cells>
                         </ColumnListItem>
