@@ -363,7 +363,12 @@ sap.ui.define([
         // },
         LoadIntervenciones: async function (Idhabilitacion) {
             if (Idhabilitacion) {
-                await this.getHabilitacion(Idhabilitacion); // Espera la finalización
+                try {
+                    await this.getHabilitacion(Idhabilitacion);
+                } catch (e) {
+                    this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
+                    return;
+                }
                 IntervencionesServices.loadIntervenciones(
                     Idhabilitacion,
                     "H0001",
@@ -385,7 +390,7 @@ sap.ui.define([
             oModelHabilitacion.setProperty("/Busy", false);
         },
         ErrorCallBackInt: function (error) {
-            MessageBox.error("Error al cargar las habilitaciones");
+            this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
         },
     //    getHabilitacion: function (Idhabilitacion) {
     //         var oView = this.getView();

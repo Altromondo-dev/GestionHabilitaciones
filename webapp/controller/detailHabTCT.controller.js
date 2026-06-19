@@ -354,16 +354,22 @@ sap.ui.define([
             this.getView().setModel(oModel, "TipoHabilitaciones");
         },*/
         LoadIntervenciones: async function (Idhabilitacion) {
-            //var oModel = this.getView().getModel("HabilitacionModel");
-            //oModel.setProperty("/Busy", true);
-            sap.ui.core.BusyIndicator.show();
+            var oModel = this.getView().getModel("HabilitacionModel");
+            oModel.setProperty("/Busy", true);
             if (Idhabilitacion) {
-                await this.getHabilitacion(Idhabilitacion);
+                try {
+                    await this.getHabilitacion(Idhabilitacion);
+                } catch (e) {
+                    oModel.setProperty("/Busy", false);
+                    return;
+                }
                 IntervencionesServices.loadIntervenciones(Idhabilitacion,
                     "H0002",
                     jQuery.proxy(this.SuccessCallBackInt, this),
                     jQuery.proxy(this.ErrorCallBackInt, this)
                 );
+            } else {
+                oModel.setProperty("/Busy", false);
             }
         },
         SuccessCallBackInt: function (data) {
@@ -380,7 +386,7 @@ sap.ui.define([
           
         },
         ErrorCallBackInt: function (error) {
-            MessageBox.error("Error al cargar las intervenciones");
+            this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
         },
         loadComments: function () {
            
@@ -413,7 +419,7 @@ sap.ui.define([
             var oHabilitacion = this.getView().getModel("Habilitacion")
             if (!oHabilitacion) {
                 MessageBoxHelper.showAlert("Leer datos de habilitación", "Ha ocurrido un error, intente nuevamente.");
-                sap.ui.core.BusyIndicator.hide();
+                this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
                 return;
                 //No funciona esto en PRD
                 //this.onBack();
@@ -493,8 +499,7 @@ sap.ui.define([
             }
             oModel.updateBindings(true);
             oModel.refresh(true);
-            sap.ui.core.BusyIndicator.hide();
-            //oModel.setProperty("/Busy", false);
+            oModel.setProperty("/Busy", false);
         },
         // getHabilitacion: function (Idhabilitacion) {
         //     var oView = this.getView();

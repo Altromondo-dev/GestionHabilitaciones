@@ -7,7 +7,14 @@
       "Bash(node reembed_xml.js)",
       "Bash(rm reembed_xml.js)",
       "Bash(node reembed.js)",
-      "Bash(rm reembed.js)"
+      "Bash(rm reembed.js)",
+      "Bash(grep -o 'Ger_Operaciones_Fecha.\\\\{0,500\\\\}' /home/user/projects/GestionHabilitaciones/webapp/utils/PrintPT15.js)",
+      "Bash(grep -o 'Planificaci.\\\\{0,1000\\\\}' /home/user/projects/GestionHabilitaciones/webapp/utils/PrintPT15.js)",
+      "Bash(grep -o '.\\\\{200\\\\}Ger_Operaciones_Fecha.\\\\{0,500\\\\}' /home/user/projects/GestionHabilitaciones/webapp/utils/PrintPT15.js)",
+      "Bash(python3 -c ':*)",
+      "Bash(grep -o 'Gerencia de Planificaci.\\\\{0,50\\\\}' /home/user/projects/GestionHabilitaciones/webapp/utils/PrintPT15.js)",
+      "Bash(grep -o \"_getGradoApto:function.\\\\{0,200\\\\}\" /home/user/projects/GestionHabilitaciones/webapp/utils/PrintPT15.js)",
+      "Bash(grep -o \"_getGradoApto:function.\\\\{0,250\\\\}\" /home/user/projects/GestionHabilitaciones/webapp/utils/PrintPT15.js)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Guillote\\Desktop\\ALTROMONDO\\GestionHabilitaciones\\webapp"

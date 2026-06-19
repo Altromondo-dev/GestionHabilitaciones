@@ -14,14 +14,18 @@ sap.ui.define([
                     "$expand": "Hab_apmedico_nav,Hab_SeguridadPublica_nav,Hab_SeguridadHigiene_nav,Hab_CETCT_nav,Hab_DesMantenimiento_nav"
                 },
                 success: jQuery.proxy(this.onSuccessCallback, this, oView, callback),
-                error: jQuery.proxy(this.onErrorCallback, this)
+                error: jQuery.proxy(this.onErrorCallback, this, callback)
             });
         },
         onSuccessCallback: function (oView, callback, data) {
             var Habilitacion = data.results[0];
-            Habilitacion.Hab_apmedico_nav = Habilitacion.Hab_apmedico_nav.results;
-            Habilitacion.Hab_SeguridadHigiene_nav = Habilitacion.Hab_SeguridadHigiene_nav.results;
-            Habilitacion.Hab_CETCT_nav = Habilitacion.Hab_CETCT_nav.results;
+            if (!Habilitacion) {
+                if (callback) callback(new Error("Sin datos"));
+                return;
+            }
+            Habilitacion.Hab_apmedico_nav = Habilitacion.Hab_apmedico_nav ? Habilitacion.Hab_apmedico_nav.results : [];
+            Habilitacion.Hab_SeguridadHigiene_nav = Habilitacion.Hab_SeguridadHigiene_nav ? Habilitacion.Hab_SeguridadHigiene_nav.results : [];
+            Habilitacion.Hab_CETCT_nav = Habilitacion.Hab_CETCT_nav ? Habilitacion.Hab_CETCT_nav.results : [];
             delete Habilitacion.metadata;
             var oModel = new sap.ui.model.json.JSONModel();
             oModel.setData(Habilitacion);
@@ -78,7 +82,8 @@ sap.ui.define([
             oView.setModel(oPristineModel, "PristineModel");
             if (callback) callback();
         },
-        onErrorCallback: function () {
+        onErrorCallback: function (callback, error) {
+            if (callback) callback(error);
         },
         saveHabilitacion: function (data, onSuccessCallback, onErrorCallback) {
             var odataModel = oDataServices.getModel();
