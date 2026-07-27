@@ -16,11 +16,23 @@
 										<items>
 											<VBox>
 												<items>
-													<Title text="{i18n>textLicHab}" titleStyle="H3" class="titleBlue" textAlign="Begin" visible="true"/>
-													<Title text="Nro. {/Idhabilitacion}" titleStyle="H5" textAlign="Begin" class="TitleSection TextIndent "/>
+													<!-- INI MOD TRNS #100775 - título y subtítulo juntos en la misma línea -->
+													<HBox alignItems="Center">
+														<Title text="{i18n>textLicHab}" titleStyle="H3" class="titleBlue" textAlign="Begin" visible="true"/>
+														<Title text="{i18n>textPerOpe}" titleStyle="H4" class="subTitleBlue sapUiHideOnTablet"/>
+													</HBox>
+													<!-- FIN MOD TRNS #100775 -->
+													<!-- INI MOD TRNS #100775 - número + origen de duplicación en la misma línea -->
+													<HBox alignItems="Center">
+														<Title text="Nro. {/Idhabilitacion}" titleStyle="H5" textAlign="Begin" class="TitleSection TextIndent "/>
+														<ObjectStatus
+															text="{HabilitacionModel>/TextoDuplicacion}"
+															visible="{= !!${HabilitacionModel>/TextoDuplicacion} }"
+															class="sapUiSmallMarginBegin"/>
+													</HBox>
+													<!-- FIN MOD TRNS #100775 -->
 												</items>
 											</VBox>
-											<Title text="{i18n>textPerOpe}" titleStyle="H4" class="subTitleBlue sapUiHideOnTablet"/>
 										</items>
 										<layoutData/>
 									</HBox>

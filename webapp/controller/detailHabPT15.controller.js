@@ -288,6 +288,14 @@ sap.ui.define([
         },
         SuccessCallBackInt: function (data) {
             var Intervenciones = data.results;
+            // INI MOD TRNS #100775 - exponer texto de duplicación en el header
+            var oDup = Intervenciones.find(function (i) {
+                return i.Datosadicionales &&
+                       i.Datosadicionales.indexOf("Habilitacion duplicada de la original") === 0;
+            });
+            this.getView().getModel("HabilitacionModel")
+                .setProperty("/TextoDuplicacion", oDup ? oDup.Datosadicionales.replace(" N ", " Nro ") : "");
+            // FIN MOD TRNS #100775
             var oModel = new sap.ui.model.json.JSONModel();
             oModel.setData({
                 Intervenciones: Intervenciones
@@ -333,11 +341,17 @@ sap.ui.define([
                     oDataModel.Habilitado_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Habilitado_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Habilitado_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                } else if (roles.includes("COT_COTDT_PT15")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("COT_COTDT_PT15")) {
+                } else if (roles.includes("COT_COTDT_PT15") || roles.includes("hab_pt15_cot")) {
+                // FIN MOD TRNS #XXXXXX
                     oDataModel.Capacitador_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Capacitador_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Capacitador_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                } else if (roles.includes("MedicinaLaboral_PT15")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("MedicinaLaboral_PT15")) {
+                } else if (roles.includes("MedicinaLaboral_PT15") || roles.includes("hab_pt15_med-laboral")) {
+                // FIN MOD TRNS #XXXXXX
                     oDataModel.Medicina_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Medicina_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Medicina_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
@@ -355,7 +369,10 @@ sap.ui.define([
                         oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
                         oDataModel.Medicina_Fecha_vencimiento_old = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
                         ValidateAptoMedico = true;*/
-                } else if (roles.includes("seguridadH_PT15")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("seguridadH_PT15")) {
+                } else if (roles.includes("seguridadH_PT15") || roles.includes("hab_pt15_seg-hig")) {
+                // FIN MOD TRNS #XXXXXX
                     if (Intervenciones[row].Datosadicionales !== "Examen Reprobado") {
                         oDataModel.SeguridadHigiene_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                         oDataModel.SeguridadHigiene_Nombre = Intervenciones[row].Nombre;
@@ -409,13 +426,24 @@ sap.ui.define([
                     oDataModel.Examinador3_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Examinador3_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Examinador3_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
-                } else if (roles.includes("Ger_Reg_Jefe_COT")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("Ger_Reg_Jefe_COT")) {
+                } else if (roles.includes("Ger_Reg_Jefe_COT") || roles.includes("hab_pt15_ger-reg-jefe-cot")) {
+                // FIN MOD TRNS #XXXXXX
                     oDataModel.Gerente_Reg_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Gerente_Reg_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Gerente_Reg_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                    var extraData = JSON.parse(Intervenciones[row].Datosadicionales);
-                    oDataModel.Gerente_Reg_Fecha_Venc = new Date(extraData.Gerente_Reg_Fecha_Venc);
-                    oDataModel.Gerente_Reg_Observacion = extraData.Gerente_Reg_Observacion;
+                    // INI MOD TRNS #XXXXXX - blindar parse: este branch pasa a ejecutarse en vivo tras Edit D
+                    // var extraData = JSON.parse(Intervenciones[row].Datosadicionales);
+                    // oDataModel.Gerente_Reg_Fecha_Venc = new Date(extraData.Gerente_Reg_Fecha_Venc);
+                    // oDataModel.Gerente_Reg_Observacion = extraData.Gerente_Reg_Observacion;
+                    var extraDataGR = {};
+                    if (Intervenciones[row].Datosadicionales && Intervenciones[row].Datosadicionales.trim() !== "") {
+                        extraDataGR = JSON.parse(Intervenciones[row].Datosadicionales);
+                    }
+                    oDataModel.Gerente_Reg_Fecha_Venc = new Date(extraDataGR.Gerente_Reg_Fecha_Venc);
+                    oDataModel.Gerente_Reg_Observacion = extraDataGR.Gerente_Reg_Observacion;
+                    // FIN MOD TRNS #XXXXXX
                     oDataModel.Gerente_Reg_Anio_Venc = String(oDataModel.Gerente_Reg_Fecha_Venc.getFullYear() - oDataModel.Gerente_Reg_Fecha.getFullYear());
                     //Agrego esto porque no trae bien el termino cuando selecciona mes o dias
                     if (oDataModel.Gerente_Reg_Fecha_Venc.getMonth() !== oDataModel.Gerente_Reg_Fecha.getMonth() || oDataModel.Gerente_Reg_Fecha_Venc
@@ -473,25 +501,41 @@ sap.ui.define([
                             oDataModel.Ger_Operaciones_Cantidad_Venc = DiasGerOp;
                         }
                     }
-                } else if (roles.includes("Gestion_Calidad_PT152")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("Gestion_Calidad_PT152")) {
+                } else if (roles.includes("Gestion_Calidad_PT152") || roles.includes("hab_pt15_gest-calidad")) {
+                // FIN MOD TRNS #XXXXXX
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Gestion_Calidad_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Gestion_Calidad_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Gestion_Calidad_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Gestion_Calidad_Fecha_Habilitacion = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
                     oDataModel.ObservacionGestionCalidad = Intervenciones[row].Datosadicionales;
-                } else if (roles.includes("Rep_Direccion_PT15")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("Rep_Direccion_PT15")) {
+                } else if (roles.includes("Rep_Direccion_PT15") || roles.includes("hab_pt15_rep-direccion")) {
+                // FIN MOD TRNS #XXXXXX
                     oDataModel.Rep_Direccion_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Rep_Direccion_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Rep_Direccion_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Rep_Direccion_Observacion = Intervenciones[row].Datosadicionales;
-                } else if (roles.includes("Direccion_TecnicaPT15")) {
+                // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
+                // } else if (roles.includes("Direccion_TecnicaPT15")) {
+                } else if (roles.includes("Direccion_TecnicaPT15") || roles.includes("hab_pt15_ger-operacion")) {
+                // FIN MOD TRNS #XXXXXX
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Direccion_Tecnica_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Direccion_Tecnica_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Direccion_Tecnica_Fecha_Vigencia = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
                     oDataModel.Direccion_Tecnica_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                    oDataModel.Direccion_Tecnica_Observacion = Intervenciones[row].Datosadicionales;
+                    // INI MOD TRNS #XXXXXX - la observacion de Dir. Tecnica llega en JSON del rol hab_pt15_ger-operacion
+                    // oDataModel.Direccion_Tecnica_Observacion = Intervenciones[row].Datosadicionales;
+                    var extraDataDT = {};
+                    if (Intervenciones[row].Datosadicionales && Intervenciones[row].Datosadicionales.trim() !== "") {
+                        extraDataDT = JSON.parse(Intervenciones[row].Datosadicionales);
+                    }
+                    oDataModel.Direccion_Tecnica_Observacion = extraDataDT.Ger_Operaciones_Observacion;
+                    // FIN MOD TRNS #XXXXXX
                 }
             }
             if (ValidateAptoMedico === false && Habilitacion.Hab_apmedico_nav && Habilitacion.Hab_apmedico_nav.length > 0) {

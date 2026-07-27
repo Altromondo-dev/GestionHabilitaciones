@@ -91,6 +91,34 @@ sap.ui.define([
                 success: onSuccessCallback,
                 error: onErrorCallback
             });
+        },
+
+        // PT15 escribe el registro maestro en Habtecnicas2PT15Set (MTO/TCT usan HabTecnicas2Set via saveHabilitacion).
+        saveHabilitacionPT15: function (data, onSuccessCallback, onErrorCallback) {
+            var odataModel = oDataServices.getModel();
+            odataModel.create("/Habtecnicas2PT15Set", data, {
+                success: onSuccessCallback,
+                error: onErrorCallback
+            });
+        },
+
+        // Lee el registro completo de la habilitación original (HabTecnicas2Set por Idhabilitacion + Clasehab real)
+        // para construir una copia idéntica. Usa el MISMO $expand que loadHabilitacion (el read del detalle,
+        // que sí devuelve datos): en este servicio el GET_ENTITYSET no devuelve filas sin el $expand.
+        // Los hijos expandidos se descartan al armar el POST (las navs van vacías).
+        readOriginal: function (idHabilitacion, claseHab, onSuccessCallback, onErrorCallback) {
+            var odataModel = oDataServices.getModel();
+            odataModel.read("/HabTecnicas2Set", {
+                filters: [
+                    new sap.ui.model.Filter("Idhabilitacion", sap.ui.model.FilterOperator.EQ, idHabilitacion),
+                    new sap.ui.model.Filter("Clasehab", sap.ui.model.FilterOperator.EQ, claseHab)
+                ],
+                urlParameters: {
+                    "$expand": "Hab_apmedico_nav,Hab_SeguridadPublica_nav,Hab_SeguridadHigiene_nav,Hab_CETCT_nav,Hab_DesMantenimiento_nav"
+                },
+                success: onSuccessCallback,
+                error: onErrorCallback
+            });
         }
     };
 });

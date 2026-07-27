@@ -42,13 +42,39 @@ sap.ui.define([
 		},
 		
 		
-		SaveIntervenciones : function(data,onSuccessCallback, onErrorCallback) {			
+		SaveIntervenciones : function(data,onSuccessCallback, onErrorCallback) {
 			var odataModel = oDataServices.getModel();
-			odataModel.create("/IntervencionesSet", data,{		
+			odataModel.create("/IntervencionesSet", data,{
 				success: onSuccessCallback,
 				error: onErrorCallback
 			});
 		},
-		
+
+		// PT15: la entidad de intervención es IntervencionesPT15Set (a diferencia de MTO/TCT que usan IntervencionesSet)
+		SaveIntervencionPT15 : function(data, onSuccessCallback, onErrorCallback) {
+			var odataModel = oDataServices.getModel();
+			odataModel.create("/IntervencionesPT15Set", data, {
+				success: onSuccessCallback,
+				error: onErrorCallback
+			});
+		},
+
+		// Lee las intervenciones PT15 de una habilitación filtrando por Idhabilitacion + Clasehab
+		// (el backend no filtra por rol). Se usa para resolver el solicitante original (firma) y copiar adjuntos.
+		loadIntervencionesPT15ByHab : function(Idhabilitacion, claseHab, onSuccessCallback, onErrorCallback) {
+			var odataModel = oDataServices.getModel();
+			odataModel.read("/IntervencionesPT15Set", {
+				filters: [
+					new sap.ui.model.Filter("Idhabilitacion", sap.ui.model.FilterOperator.EQ, Idhabilitacion),
+					new sap.ui.model.Filter("Clasehab", sap.ui.model.FilterOperator.EQ, claseHab)
+				],
+				urlParameters: {
+					"$expand": "AdjuntosSet"
+				},
+				success: onSuccessCallback,
+				error: onErrorCallback
+			});
+		}
+
 	};
 });

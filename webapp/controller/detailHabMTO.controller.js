@@ -379,6 +379,14 @@ sap.ui.define([
         },
         SuccessCallBackInt: function (data) {
             var Intervenciones = data.results;
+            // INI MOD TRNS #100775 - exponer texto de duplicación en el header
+            var oDup = Intervenciones.find(function (i) {
+                return i.Datosadicionales &&
+                       i.Datosadicionales.indexOf("Habilitacion duplicada de la original") === 0;
+            });
+            this.getView().getModel("HabilitacionModel")
+                .setProperty("/TextoDuplicacion", oDup ? oDup.Datosadicionales.replace(" N ", " Nro ") : "");
+            // FIN MOD TRNS #100775
             var oModel = new sap.ui.model.json.JSONModel();
             oModel.setData({
                 Intervenciones: Intervenciones

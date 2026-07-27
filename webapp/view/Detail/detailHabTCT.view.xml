@@ -13,7 +13,15 @@
 								renderType="Div" visible="true" displayInline="false">
 								<items>
 									<Title text="{i18n>titleTCT}" titleStyle="H3" class="titleBlue" width="auto" textAlign="Begin" visible="true"/>
-									<Title text="Nro. {/Idhabilitacion}" titleStyle="H5" textAlign="Begin" class="TitleSection TextIndent "/>
+									<!-- INI MOD TRNS #100775 - número + origen de duplicación en la misma línea -->
+									<HBox alignItems="Center">
+										<Title text="Nro. {/Idhabilitacion}" titleStyle="H5" textAlign="Begin" class="TitleSection TextIndent "/>
+										<ObjectStatus
+											text="{HabilitacionModel>/TextoDuplicacion}"
+											visible="{= !!${HabilitacionModel>/TextoDuplicacion} }"
+											class="sapUiSmallMarginBegin"/>
+									</HBox>
+									<!-- FIN MOD TRNS #100775 -->
 								</items>
 								<layoutData/>
 							</VBox>

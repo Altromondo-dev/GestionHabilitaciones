@@ -14,7 +14,7 @@
         <content>
             <VBox class="sapUiSmallMargin">
 
-                <!-- Campos editables: dirección, número y región nueva -->
+                <!-- Dirección (calculada, solo lectura), región nueva y selector de adjuntos -->
                 <f:Form editable="true">
                     <f:layout>
                         <f:ResponsiveGridLayout
@@ -28,23 +28,8 @@
                             <f:formElements>
                                 <f:FormElement label="Dirección">
                                     <f:fields>
-                                        <Select selectedKey="{DuplicarModel>/Nomenclatura}">
-                                            <core:Item key="MR" text="MR — Transba → Transener"/>
-                                            <core:Item key="MB" text="MB — Transener → Transba"/>
-                                        </Select>
-                                    </f:fields>
-                                </f:FormElement>
-                            </f:formElements>
-                        </f:FormContainer>
-                        <f:FormContainer>
-                            <f:formElements>
-                                <f:FormElement label="N° habilitación">
-                                    <f:fields>
-                                        <Input
-                                            value="{DuplicarModel>/NuevoNumero}"
-                                            placeholder="ej: 000001"
-                                            maxLength="6"
-                                            description="{DuplicarModel>/Nomenclatura}"/>
+                                        <!-- La dirección MR/MB se deduce de la sociedad de la original; no es editable -->
+                                        <Text text="{DuplicarModel>/DireccionTexto}"/>
                                     </f:fields>
                                 </f:FormElement>
                             </f:formElements>
@@ -56,8 +41,8 @@
                                         <ComboBox
                                             selectedKey="{DuplicarModel>/NuevaArea}"
                                             placeholder="Seleccionar región"
-                                            items="{path: 'AllRegiones>/Regiones'}">
-                                            <core:Item key="{AllRegiones>Codigo}" text="{AllRegiones>Region}"/>
+                                            items="{path: 'DuplicarModel>/RegionesDestino'}">
+                                            <core:Item key="{DuplicarModel>Codigo}" text="{DuplicarModel>Region}"/>
                                         </ComboBox>
                                     </f:fields>
                                 </f:FormElement>
@@ -146,10 +131,10 @@
                         <f:FormContainer>
                             <f:formElements>
                                 <f:FormElement label="{i18n>Idhabilitacion}">
-                                    <f:fields><Text text="{DuplicarModel>/Nomenclatura}{DuplicarModel>/NuevoNumero}" class="sapUiStrongText"/></f:fields>
+                                    <f:fields><Text text="(se asigna al confirmar)" class="sapUiStrongText"/></f:fields>
                                 </f:FormElement>
                                 <f:FormElement label="{i18n>Empresa}">
-                                    <f:fields><Text text="{DuplicarModel>/Empresa}"/></f:fields>
+                                    <f:fields><Text text="{DuplicarModel>/DestinoEmpresa}"/></f:fields>
                                 </f:FormElement>
                                 <f:FormElement label="{i18n>Legajo}">
                                     <f:fields><Text text="{DuplicarModel>/Legajo}"/></f:fields>
@@ -187,7 +172,7 @@
                                     <f:fields><Text text="{path: 'DuplicarModel>/VtoApto', formatter: '.formatFechas'}"/></f:fields>
                                 </f:FormElement>
                                 <f:FormElement label="{i18n>Estado}">
-                                    <f:fields><Text text="Nueva Habilitacion"/></f:fields>
+                                    <f:fields><Text text="Habilitada"/></f:fields>
                                 </f:FormElement>
                             </f:formElements>
                         </f:FormContainer>
@@ -198,10 +183,13 @@
         </content>
 
         <beginButton>
+            <!-- INI MOD TRNS #XXXXXX - exigir Región / Área seleccionada para habilitar el botón -->
             <Button
                 text="Confirmar Duplicado"
                 type="Emphasized"
+                enabled="{= ${DuplicarModel>/Estado} === 'H' &amp;&amp; !!${DuplicarModel>/NuevaArea} }"
                 press=".onConfirmarDuplicar"/>
+            <!-- FIN MOD TRNS #XXXXXX -->
         </beginButton>
         <endButton>
             <Button

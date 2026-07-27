@@ -10,9 +10,10 @@ sap.ui.define([
     "transener/GestionHabilitaciones/utils/FormatHelper",
     "transener/GestionHabilitaciones/services/PuestosServices",
     "transener/GestionHabilitaciones/services/EstacionesServices",
-    "transener/GestionHabilitaciones/services/HabilitacionServices"
+    "transener/GestionHabilitaciones/services/HabilitacionServices",
+    "transener/GestionHabilitaciones/utils/DuplicarHabilitacionHelper"
 ], function (Controller, MessageBox, HabTecnicasService, HabRangoService, RegionServices,
-    TipoHabilitacionServices, NavigationHelper, MessageBoxHelper, FormatHelper, PuestosServices, EstacionesServices, HabilitacionServices) {
+    TipoHabilitacionServices, NavigationHelper, MessageBoxHelper, FormatHelper, PuestosServices, EstacionesServices, HabilitacionServices, DuplicarHabilitacionHelper) {
     "use strict";
     return Controller.extend("transener.GestionHabilitaciones.controller.Main", {
 
@@ -348,12 +349,60 @@ sap.ui.define([
 
         onBeforeOpenContextMenu: function (oEvent) {
             this._oContextItem = oEvent.getParameter("listItem");
+            // TEMP: duplicar habilitado para cualquier rol — control de región desactivado
+            // var oHab = this._oContextItem.getBindingContext("Habilitaciones").getObject();
+            // var bAllowed = this._canDuplicateRegion(oHab.Area);
+            // var oItem = this.byId("menuItemDuplicar");
+            // if (oItem) {
+            //     oItem.setEnabled(bAllowed);
+            // }
+        },
+
+        // Regiones habilitadas del usuario: parte <region> de sus grupos hab_mto_secretaria_<region>.
+        // El "mto" del nombre es incidental: esa región habilita duplicar cualquier clase (PT15/MTO/TCT).
+        // Los grupos ya están en UserJsonModel (los carga UserService al iniciar); no se llama al IAS.
+        _getSecretariaRegions: function () {
+            var oModel = sap.ui.getCore().getModel("UserJsonModel");
+            var oData = oModel && oModel.getData();
+            var aRoles = (oData && oData.User && oData.User[0] && oData.User[0].roles) || [];
+            var aRegions = [];
+            aRoles.forEach(function (sRole) {
+                var aMatch = /^hab_mto_secretaria_(.+)$/i.exec(sRole);
+                if (aMatch) {
+                    aRegions.push(aMatch[1]);
+                }
+            });
+            return aRegions;
+        },
+
+        // La región de la habilitación (campo Area, ej. "1002") debe estar entre las regiones de secretaría del usuario.
+        _canDuplicateRegion: function (sArea) {
+            return this._getSecretariaRegions().indexOf(String(sArea)) >= 0;
         },
 
         onDuplicateHab: function () {
             var oHab = this._oContextItem.getBindingContext("Habilitaciones").getObject();
-            var sNomenclatura = oHab.Empresa.toUpperCase().includes("TRANSENER") ? "MB" : "MR";
-            var sNumero = oHab.Idhabilitacion.replace(/[^0-9]/g, "");
+
+            // TEMP: guard de región desactivado — cualquier rol puede duplicar
+            // if (!this._canDuplicateRegion(oHab.Area)) {
+            //     MessageBox.information("Solo podés duplicar habilitaciones de las regiones donde sos secretaría.");
+            //     return;
+            // }
+
+            // Solo se pueden duplicar habilitaciones en estado "H" (Habilitado).
+            if (oHab.Estado !== "H") {
+                MessageBox.information("Solo se pueden duplicar habilitaciones en estado Habilitado (H).");
+                return;
+            }
+
+            // Dirección MR/MB y sociedad destino se DEDUCEN de la sociedad de la original (no las elige el usuario).
+            var bOrigenTransener = oHab.Empresa.toUpperCase().indexOf("TRANSENER") >= 0;
+            var sNomenclatura = bOrigenTransener ? "MB" : "MR"; // Transener→MB (hacia Transba); Transba→MR (hacia Transener)
+            var sDestinoEmpresa = bOrigenTransener ? "TRANSBA" : "TRANSENER";
+            var sDestinoBukrs = bOrigenTransener ? "300" : "100";
+            var sDireccionTexto = (bOrigenTransener ? "Transener → Transba" : "Transba → Transener") + " (" + sNomenclatura + ")";
+            var sPlaceholderId = sNomenclatura === "MR" ? "8888888888" : "7777777777"; // MR→hacia Transener; MB→hacia Transba
+
             var oDuplicarModel = new sap.ui.model.json.JSONModel({
                 Apellido: oHab.Apellido,
                 Area: oHab.Area,
@@ -374,12 +423,27 @@ sap.ui.define([
                 FechaCreacion: oHab.FechaCreacion,
                 Estado: oHab.Estado,
                 Idhabilitacion: oHab.Idhabilitacion,
-                // Campos para la nueva habilitación
+                // Campos calculados para la nueva habilitación (destino)
                 Nomenclatura: sNomenclatura,
-                NuevoNumero: sNumero,
-                NuevaArea: ""
+                DestinoEmpresa: sDestinoEmpresa,
+                DestinoBukrs: sDestinoBukrs,
+                DireccionTexto: sDireccionTexto,
+                PlaceholderId: sPlaceholderId,
+                NuevaArea: "",
+                RegionesDestino: []
             });
             this.getView().setModel(oDuplicarModel, "DuplicarModel");
+
+            // El combo de región solo ofrece regiones de la sociedad DESTINO (Empresa: 100 Transener / 300 Transba),
+            // porque la hab duplicada vive en la sociedad opuesta a la original.
+            RegionServices.LoadRegiones(sDestinoBukrs,
+                function (oResp) {
+                    oDuplicarModel.setProperty("/RegionesDestino", (oResp && oResp.results) || []);
+                },
+                function () {
+                    oDuplicarModel.setProperty("/RegionesDestino", []);
+                }
+            );
 
             if (!this._oDuplicarDialog) {
                 this._oDuplicarDialog = sap.ui.xmlfragment(
@@ -397,22 +461,53 @@ sap.ui.define([
         },
 
         onConfirmarDuplicar: function () {
-            // TODO: implementar guardado
+            // Guard de reentrada: evita que un doble click (o doble disparo del press) lance
+            // dos veces la cadena de duplicación y cree dos habilitaciones.
+            if (this._bDuplicando) {
+                return;
+            }
+            this._bDuplicando = true;
+            var oData = this.getView().getModel("DuplicarModel").getData();
+            // INI MOD TRNS #XXXXXX - validar Región / Área obligatoria antes de duplicar
+            if (!oData.NuevaArea) {
+                this._bDuplicando = false;   // liberar el guard: el intento no prosperó
+                MessageBox.warning("Debe seleccionar una Región / Área para duplicar.");
+                return;
+            }
+            // FIN MOD TRNS #XXXXXX
+            var that = this;
+            if (this._oDuplicarDialog) {
+                this._oDuplicarDialog.setBusyIndicatorDelay(0);
+                this._oDuplicarDialog.setBusy(true);
+            }
+            DuplicarHabilitacionHelper.duplicar(oData)
+                .then(function (oResult) {
+                    that._onDuplicarSuccess(oResult.Idhabilitacion);
+                })
+                .catch(function (err) {
+                    that._onDuplicarError(err);
+                });
         },
 
         onCancelarDuplicar: function () {
             this._oDuplicarDialog.close();
         },
 
-        _onDuplicarSuccess: function () {
-            this.getView().getModel("Habilitaciones").setProperty("/Busy", false);
-            MessageBox.success("Habilitación duplicada con éxito.");
-            this._oDuplicarDialog.close();
+        _onDuplicarSuccess: function (sNumeroReal) {
+            this._bDuplicando = false;
+            if (this._oDuplicarDialog) {
+                this._oDuplicarDialog.setBusy(false);
+                this._oDuplicarDialog.close();
+            }
+            MessageBox.success("Habilitación duplicada con éxito. N° " + sNumeroReal);
             this.loadHabilitacionesModel();
         },
 
         _onDuplicarError: function () {
-            this.getView().getModel("Habilitaciones").setProperty("/Busy", false);
+            this._bDuplicando = false;
+            if (this._oDuplicarDialog) {
+                this._oDuplicarDialog.setBusy(false);
+            }
             MessageBox.error("Error al duplicar la habilitación.");
         },
 

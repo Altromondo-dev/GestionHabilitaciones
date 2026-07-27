@@ -366,6 +366,7 @@
                     <contextMenu>
                         <Menu>
                             <MenuItem
+                                id="menuItemDuplicar"
                                 text="Duplicar Habilitacion"
                                 icon="sap-icon://copy"
                                 press=".onDuplicateHab"/>
