@@ -349,13 +349,12 @@ sap.ui.define([
 
         onBeforeOpenContextMenu: function (oEvent) {
             this._oContextItem = oEvent.getParameter("listItem");
-            // TEMP: duplicar habilitado para cualquier rol — control de región desactivado
-            // var oHab = this._oContextItem.getBindingContext("Habilitaciones").getObject();
-            // var bAllowed = this._canDuplicateRegion(oHab.Area);
-            // var oItem = this.byId("menuItemDuplicar");
-            // if (oItem) {
-            //     oItem.setEnabled(bAllowed);
-            // }
+            var oHab = this._oContextItem.getBindingContext("Habilitaciones").getObject();
+            var bAllowed = this._canDuplicateRegion(oHab.Area);
+            var oItem = this.byId("menuItemDuplicar");
+            if (oItem) {
+                oItem.setEnabled(bAllowed);
+            }
         },
 
         // Regiones habilitadas del usuario: parte <region> de sus grupos hab_mto_secretaria_<region>.
@@ -383,11 +382,10 @@ sap.ui.define([
         onDuplicateHab: function () {
             var oHab = this._oContextItem.getBindingContext("Habilitaciones").getObject();
 
-            // TEMP: guard de región desactivado — cualquier rol puede duplicar
-            // if (!this._canDuplicateRegion(oHab.Area)) {
-            //     MessageBox.information("Solo podés duplicar habilitaciones de las regiones donde sos secretaría.");
-            //     return;
-            // }
+            if (!this._canDuplicateRegion(oHab.Area)) {
+                MessageBox.information("Solo podés duplicar habilitaciones de las regiones donde sos secretaría.");
+                return;
+            }
 
             // Solo se pueden duplicar habilitaciones en estado "H" (Habilitado).
             if (oHab.Estado !== "H") {

@@ -849,6 +849,124 @@ sap.ui.define([
                 return false;
             }
         },
+        // INI MOD TRNS #XXXXXX - edicion por rol PT15
+        _normalizarRoles: function (vRoles) {
+            if (!vRoles) { return []; }
+            if (Array.isArray(vRoles)) { return vRoles; }
+            if (typeof vRoles === "string") { return [vRoles]; }
+            return [];
+        },
+
+        _normalizarUO: function (vUO) {
+            if (vUO === null || vUO === undefined) { return ""; }
+            return String(vUO).trim();
+        },
+
+        _tieneRolGlobal: function (vRoles, aNombres) {
+            var aRoles = this._normalizarRoles(vRoles);
+            return aNombres.some(function (s) {
+                return aRoles.indexOf(s) !== -1;   // match EXACTO
+            });
+        },
+
+        _tieneRolRegional: function (vRoles, sPrefijo, vUO, aLegacy) {
+            var aRoles  = this._normalizarRoles(vRoles);
+            var sUO     = this._normalizarUO(vUO);
+            var sEsperado = sPrefijo + "_" + sUO;
+
+            var bMatch = aRoles.indexOf(sEsperado) !== -1;
+
+            // Fallback tolerante a ceros a la izquierda / padding
+            if (!bMatch && sUO) {
+                var sUOsinCeros = sUO.replace(/^0+/, "");
+                bMatch = aRoles.indexOf(sPrefijo + "_" + sUOsinCeros) !== -1;
+            }
+
+            // Roles legacy sin region (compatibilidad hacia atras)
+            if (!bMatch && aLegacy && aLegacy.length) {
+                bMatch = this._tieneRolGlobal(aRoles, aLegacy);
+            }
+
+            console.log("### TRNS-DIAG regional | prefijo:", sPrefijo,
+                        "| UO:", JSON.stringify(sUO),
+                        "| esperado:", sEsperado,
+                        "| roles:", JSON.stringify(aRoles),
+                        "| match:", bMatch);
+            return bMatch;
+        },
+
+        _estadoPermiteEdicion: function (vEstado) {
+            // PENDIENTE DEFINICION FUNCIONAL (Ivan): misma regla que
+            // onEnableRol3. Si alguna seccion necesita otra lista,
+            // parametrizar aca.
+            var aBloqueados = ["C", "D", "F", "N"];
+            return aBloqueados.indexOf(this._normalizarUO(vEstado)) === -1;
+        },
+
+        // GLOBALES (sin region)
+        onEnableMedLaboral: function (vRoles, vEstado) {
+            if (!this._estadoPermiteEdicion(vEstado)) { return false; }
+            return this._tieneRolGlobal(vRoles,
+                ["hab_pt15_med-laboral", "MedicinaLaboral_PT15", "Medicina_Laboral"]);
+        },
+
+        onEnableRepDireccion: function (vRoles, vEstado) {
+            if (!this._estadoPermiteEdicion(vEstado)) { return false; }
+            return this._tieneRolGlobal(vRoles,
+                ["hab_pt15_rep-direccion", "Rep_Direccion_PT15"]);
+        },
+
+        // REGIONALES (requieren UO)
+        onEnableSegHig: function (vRoles, vUO, vEstado) {
+            if (!this._estadoPermiteEdicion(vEstado)) { return false; }
+            return this._tieneRolRegional(vRoles, "hab_pt15_seg-hig", vUO,
+                ["seguridadH_PT15"]);
+        },
+
+        onEnableGerReg: function (vRoles, vUO, vEstado) {
+            if (!this._estadoPermiteEdicion(vEstado)) { return false; }
+            return this._tieneRolRegional(vRoles, "hab_pt15_ger-reg-jefe-cot", vUO,
+                ["Ger_Reg_Jefe_COT", "PT15_GerRegional"]);
+        },
+
+        onEnableGestCalidad: function (vRoles, vUO, vEstado) {
+            if (!this._estadoPermiteEdicion(vEstado)) { return false; }
+            return this._tieneRolRegional(vRoles, "hab_pt15_gest-calidad", vUO,
+                ["Gestion_Calidad_PT152", "Gestion_Calidad_PT15"]);
+        },
+
+        // Habilita el boton Guardar si el usuario puede editar
+        // AL MENOS una seccion
+        onEnableGuardar: function (vRoles, vUO, vEstado) {
+            return this.onEnableMedLaboral(vRoles, vEstado)
+                || this.onEnableRepDireccion(vRoles, vEstado)
+                || this.onEnableSegHig(vRoles, vUO, vEstado)
+                || this.onEnableGerReg(vRoles, vUO, vEstado)
+                || this.onEnableGestCalidad(vRoles, vUO, vEstado);
+        },
+
+        onChangeDateSeguridadHigiene: function (oEvent) {
+            console.log("### TRNS-DIAG onChangeDateSeguridadHigiene (stub)",
+                        oEvent.getSource().getSelectedKey());
+        },
+        onChangeTimeSeguridadHigiene: function (oEvent) {
+            console.log("### TRNS-DIAG onChangeTimeSeguridadHigiene (stub)",
+                        oEvent.getSource().getSelectedKey());
+        },
+        onSelectReprobate: function (oEvent) {
+            console.log("### TRNS-DIAG onSelectReprobate (stub)");
+        },
+        onChangeDateGerRegional: function (oEvent) {
+            console.log("### TRNS-DIAG onChangeDateGerRegional (stub)",
+                        oEvent.getSource().getSelectedKey());
+        },
+        onChangeTimeGerRegional: function (oEvent) {
+            console.log("### TRNS-DIAG onChangeTimeGerRegional (stub)",
+                        oEvent.getSource().getSelectedKey());
+        },
+        // FIN MOD TRNS #XXXXXX
+
+        // DEPRECADA TRNS #XXXXXX - reemplazada por formatters por seccion
         onEnableRol2: function (rol) {
             if (rol) {
                 if (
@@ -863,6 +981,7 @@ sap.ui.define([
                 return false;
             }
         },
+        // DEPRECADA TRNS #XXXXXX - reemplazada por formatters por seccion
         onEnableRol3: function (rol, estado) {
             if (!rol) {
                 return false;

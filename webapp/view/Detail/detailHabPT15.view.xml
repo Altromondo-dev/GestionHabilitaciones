@@ -306,9 +306,15 @@
 															<f:formElements>
 																<f:FormElement label="{i18n>GradoAptitud}">
 																	<f:fields>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<ComboBox selectedKey="{HabilitacionModel>/Gradoap}"
 																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}"
 																			items="{gradoAptitud>/gradoAptitud}">
+																		-->
+																		<ComboBox selectedKey="{HabilitacionModel>/Gradoap}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}"
+																			items="{gradoAptitud>/gradoAptitud}">
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																			<items>
 																				<core:Item key="{gradoAptitud>Codigo}" text="{gradoAptitud>Grado}"/>
 																			</items>
@@ -317,12 +323,21 @@
 																</f:FormElement>
 																<f:FormElement label="{i18n>FechaVencimiento}">
 																	<f:fields>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<DatePicker dateValue="{HabilitacionModel>/Medicina_Fecha_vencimiento}" displayFormat="dd/MM/yyyy"
 																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}">
 																			<layoutData>
 																				<l:GridData span="L4 M4 S12"/>
 																			</layoutData>
 																		</DatePicker>
+																		-->
+																		<DatePicker dateValue="{HabilitacionModel>/Medicina_Fecha_vencimiento}" displayFormat="dd/MM/yyyy"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}">
+																			<layoutData>
+																				<l:GridData span="L4 M4 S12"/>
+																			</layoutData>
+																		</DatePicker>
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																	</f:fields>
 																</f:FormElement>
 																<f:FormElement>
@@ -368,12 +383,20 @@
 															<f:formElements>
 																<f:FormElement label="{i18n>Aprobado}">
 																	<f:fields>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/aprobadoCheck}" text="Si" editable="false">
+																		-->
+																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/aprobadoCheck}" text="Si" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																			<layoutData>
 																				<l:GridData span="L1 M1 S4"/>
 																			</layoutData>
 																		</RadioButton>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/reprobadoCheck}" select="onSelectReprobate" text="No" editable="false">
+																		-->
+																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/reprobadoCheck}" select="onSelectReprobate" text="No" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																			<layoutData>
 																				<l:GridData span="L1 M1 S4"/>
 																			</layoutData>
@@ -395,6 +418,7 @@
 														<f:FormContainer>
 															<f:formElements>
 																<f:FormElement label="{i18n>FechaExamen}">
+																	<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																	<f:fields>
 																		<DatePicker dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha_examen}" displayFormat="dd/MM/yyyy"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
@@ -402,13 +426,30 @@
 																				<l:GridData span="L4 M4 S12"/>
 																			</layoutData>
 																		</DatePicker>
+																	-->
+																	<f:fields>
+																		<DatePicker dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha_examen}" displayFormat="dd/MM/yyyy"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																			<layoutData>
+																				<l:GridData span="L4 M4 S12"/>
+																			</layoutData>
+																		</DatePicker>
+																	<!-- FIN MOD TRNS #XXXXXX -->
 																	</f:fields>
 																</f:FormElement>
 																<f:FormElement label="{i18n>Fecha}">
+																	<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																	<f:fields>
 																		<DatePicker editable="false" dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha}" displayFormat="dd/MM/yyyy"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}"/>
 																	</f:fields>
+																	-->
+																	<f:fields>
+																		<DatePicker editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}" dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha}" displayFormat="dd/MM/yyyy"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"/>
+																	</f:fields>
+																	<!-- FIN MOD TRNS #XXXXXX -->
 																</f:FormElement>
 																<f:FormElement>
 																	<f:fields>
@@ -417,6 +458,7 @@
 																				<l:GridData span="XL3 L3 M3 S12"/>
 																			</layoutData>
 																		</Label>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<ComboBox selectedKey="{HabilitacionModel>/SeguridadHigiene_Anio_Venc}" change="onChangeDateSeguridadHigiene"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
 																			<items>
@@ -429,12 +471,38 @@
 																				<l:GridData span="XL3 L3 M3 S12"/>
 																			</layoutData>
 																		</ComboBox>
+																		-->
+																		<ComboBox selectedKey="{HabilitacionModel>/SeguridadHigiene_Anio_Venc}" change="onChangeDateSeguridadHigiene"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																			<items>
+																				<core:Item text="1 Año" key="1"/>
+																				<core:Item text="2 Años" key="2"/>
+																				<core:Item text="3 Años" key="3"/>
+																				<core:Item text="Otros" key="0"/>
+																			</items>
+																			<layoutData>
+																				<l:GridData span="XL3 L3 M3 S12"/>
+																			</layoutData>
+																		</ComboBox>
+																		<!-- FIN MOD TRNS #XXXXXX -->
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<Input type="Number" maxLength="2" value="{HabilitacionModel>/SeguridadHigiene_Cantidad_Venc}"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
 																			<layoutData>
 																				<l:GridData span="XL1 L1 M1 S6"/>
 																			</layoutData>
 																		</Input>
+																		-->
+																		<Input type="Number" maxLength="2" value="{HabilitacionModel>/SeguridadHigiene_Cantidad_Venc}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																			<layoutData>
+																				<l:GridData span="XL1 L1 M1 S6"/>
+																			</layoutData>
+																		</Input>
+																		<!-- FIN MOD TRNS #XXXXXX -->
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<ComboBox selectedKey="{HabilitacionModel>/SeguridadHigiene_Tiempo_Venc}" change="onChangeTimeSeguridadHigiene"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
 																			<items>
@@ -445,20 +513,48 @@
 																				<l:GridData span="XL2 L2 M2 S6"/>
 																			</layoutData>
 																		</ComboBox>
+																		-->
+																		<ComboBox selectedKey="{HabilitacionModel>/SeguridadHigiene_Tiempo_Venc}" change="onChangeTimeSeguridadHigiene"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																			<items>
+																				<core:Item text="Días" key="Dia"/>
+																				<core:Item text="Meses" key="Mes"/>
+																			</items>
+																			<layoutData>
+																				<l:GridData span="XL2 L2 M2 S6"/>
+																			</layoutData>
+																		</ComboBox>
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																	</f:fields>
 																</f:FormElement>
+																<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																<f:FormElement label="{i18n>Observaciones}">
 																	<f:fields>
 																		<TextArea value="{HabilitacionModel>/SeguridadHigiene_Observacion}"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}"/>
 																	</f:fields>
 																</f:FormElement>
+																-->
+																<f:FormElement label="{i18n>Observaciones}">
+																	<f:fields>
+																		<TextArea value="{HabilitacionModel>/SeguridadHigiene_Observacion}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"/>
+																	</f:fields>
+																</f:FormElement>
+																<!-- FIN MOD TRNS #XXXXXX -->
 																<f:FormElement label="{i18n>Firma}">
 																	<f:fields>
 																		<Image class="signatureBackground" src="{HabilitacionModel>/SeguridadHigiene_Firma}" height="70px" width="200px" densityAware="false"/>
 																		<Label text="{i18n>Aclaracion}:" class="topLabel TextEnd"/>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<Input editable="false" type="Text" value="{HabilitacionModel>/SeguridadHigiene_Nombre}"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}"/>
+																		-->
+																		<Input editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}" type="Text" value="{HabilitacionModel>/SeguridadHigiene_Nombre}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"/>
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																	</f:fields>
 																</f:FormElement>
 															</f:formElements>
@@ -659,6 +755,7 @@
 																				<l:GridData span="XL3 L3 M3 S12"/>
 																			</layoutData>
 																		</Label>
+																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<ComboBox selectedKey="{HabilitacionModel>/Gerente_Reg_Anio_Venc}" change="onChangeDateGerRegional" editable="false">
 																			<items>
 																				<core:Item text="1 Año" key="1"/>
@@ -685,16 +782,53 @@
 																			</layoutData>
 																		</ComboBox>
 																	</f:fields>
+																		-->
+																		<ComboBox selectedKey="{HabilitacionModel>/Gerente_Reg_Anio_Venc}" change="onChangeDateGerRegional" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																			<items>
+																				<core:Item text="1 Año" key="1"/>
+																				<core:Item text="2 Años" key="2"/>
+																				<core:Item text="3 Años" key="3"/>
+																				<core:Item text="Otros" key="0"/>
+																			</items>
+																			<layoutData>
+																				<l:GridData span="XL3 L3 M3 S12"/>
+																			</layoutData>
+																		</ComboBox>
+																		<Input type="Number" value="{HabilitacionModel>/Gerente_Reg_Cantidad_Venc}" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																			<layoutData>
+																				<l:GridData span="XL1 L1 M1 S6"/>
+																			</layoutData>
+																		</Input>
+																		<ComboBox selectedKey="{HabilitacionModel>/Gerente_Reg_Tiempo_Venc}" change="onChangeTimeGerRegional" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																			<items>
+																				<core:Item text="Días" key="Dia"/>
+																				<core:Item text="Meses" key="Mes"/>
+																			</items>
+																			<layoutData>
+																				<l:GridData span="XL2 L2 M2 S6"/>
+																			</layoutData>
+																		</ComboBox>
+																	</f:fields>
+																		<!-- FIN MOD TRNS #XXXXXX -->
 																</f:FormElement>
 															</f:formElements>
 														</f:FormContainer>
 														<f:FormContainer>
 															<f:formElements>
+																<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																<f:FormElement label="{i18n>Observaciones}">
 																	<f:fields>
 																		<TextArea value="{HabilitacionModel>/Gerente_Reg_Observacion}"
 																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Gerente_Reg'], formatter: '.onEnableRol2'}"/>
 																	</f:fields>
+																-->
+																<f:FormElement label="{i18n>Observaciones}">
+																	<f:fields>
+																		<TextArea value="{HabilitacionModel>/Gerente_Reg_Observacion}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}"
+																			editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}"/>
+																	</f:fields>
+																<!-- FIN MOD TRNS #XXXXXX -->
 																</f:FormElement>
 																<f:FormElement>
 																	<Label text="{i18n>Aclaracion}:" class="topLabel TextEnd">
@@ -702,12 +836,21 @@
 																			<l:GridData span="XL3 L3 M3 S12"/>
 																		</layoutData>
 																	</Label>
+																	<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																	<Input type="Text" value="{HabilitacionModel>/Gerente_Reg_Nombre}"
 																		enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Gerente_Reg'], formatter: '.onEnableRol2'}" editable="false">
 																		<layoutData>
 																			<l:GridData span="XL3 L3 M3 S12"/>
 																		</layoutData>
 																	</Input>
+																	-->
+																	<Input type="Text" value="{HabilitacionModel>/Gerente_Reg_Nombre}"
+																		editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																		<layoutData>
+																			<l:GridData span="XL3 L3 M3 S12"/>
+																		</layoutData>
+																	</Input>
+																	<!-- FIN MOD TRNS #XXXXXX -->
 																	<Label text="{i18n>Firma}:" class="topLabel TextEnd">
 																		<layoutData>
 																			<l:GridData span="XL3 L3 M3 S12"/>
@@ -843,10 +986,17 @@
 																		<Title text="{i18n>GestionCalidad}" titleStyle="H5" class="TitleBolder" width="auto" textAlign="Begin" visible="true"/>
 																	</f:fields>
 																</f:FormElement>
+																<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																<f:FormElement label="{i18n>Observaciones}">
 																	<f:fields>
 																		<TextArea value="{HabilitacionModel>/ObservacionGestionCalidad}" rows="3" editable="false" cols="110" maxLength="0"/>
 																	</f:fields>
+																-->
+																<f:FormElement label="{i18n>Observaciones}">
+																	<f:fields>
+																		<TextArea value="{HabilitacionModel>/ObservacionGestionCalidad}" rows="3" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGestCalidad'}" cols="110" maxLength="0"/>
+																	</f:fields>
+																<!-- FIN MOD TRNS #XXXXXX -->
 																</f:FormElement>
 																<f:FormElement label="{i18n>fechaGc}">
 																	<f:fields>
@@ -907,10 +1057,17 @@
 																		<Label text="{i18n>textVerif}"/>
 																	</f:fields>
 																</f:FormElement>
+																<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																<f:FormElement label="{i18n>Observaciones}">
 																	<f:fields>
 																		<TextArea rows="3" cols="110" value="{HabilitacionModel>/Rep_Direccion_Observacion}" editable="false"/>
 																	</f:fields>
+																-->
+																<f:FormElement label="{i18n>Observaciones}">
+																	<f:fields>
+																		<TextArea rows="3" cols="110" value="{HabilitacionModel>/Rep_Direccion_Observacion}" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRepDireccion'}"/>
+																	</f:fields>
+																<!-- FIN MOD TRNS #XXXXXX -->
 																</f:FormElement>
 																<f:FormElement label="{i18n>Fecha}">
 																	<f:fields>
@@ -1119,7 +1276,11 @@
 				<footer>
 					<Toolbar>
 						<ToolbarSpacer/>
+						<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}" text="{i18n>GuardarDatos}" />
+						-->
+						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGuardar'}" text="{i18n>GuardarDatos}" />
+						<!-- FIN MOD TRNS #XXXXXX -->
 						<Button icon="sap-icon://edit" press="onChangeStatus" visible="{ path: 'Habilitacion>/Estado', formatter: '.ShowButtonStatus'}" text="{i18n>CambiarEstado}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableChangeStatus'}" />
 					    <Button icon="sap-icon://print" press="_onDonwloadHabilitacion" text="{i18n>Imprimir}"/>
 					</Toolbar>
