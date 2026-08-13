@@ -331,6 +331,9 @@ sap.ui.define([
             }
             var Habilitacion = this.getView().getModel("Habilitacion").getData();
             var ValidateAptoMedico = false;
+            // INI MOD TRNS #PT-27 - defensa en profundidad: try/catch/finally para que una excepcion en el procesamiento no deje el busy colgado
+            var oModel = this.getView().getModel("HabilitacionModel");
+            try {
             for (var row in Intervenciones) {
                 var roles = Intervenciones[row].Rol;
                 if (roles.includes("SOLICITANTE_PT15")) {
@@ -410,7 +413,10 @@ sap.ui.define([
                                 oDataModel.SeguridadHigiene_Cantidad_Venc = oTime;
                             } else {
                                 oDataModel.SeguridadHigiene_Tiempo_Venc = "Dia";
-                                oDataModel.SeguridadHigiene_Cantidad_Venc = DiasSegHig;
+                                // INI MOD TRNS #PT-27 - DiasSegHig no estaba declarada, la variable correcta es Dias
+                                // oDataModel.SeguridadHigiene_Cantidad_Venc = DiasSegHig;
+                                oDataModel.SeguridadHigiene_Cantidad_Venc = Dias;
+                                // FIN MOD TRNS #PT-27
                             }
                         }
                     }
@@ -544,10 +550,15 @@ sap.ui.define([
                 oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
                 oDataModel.Medicina_Fecha_vencimiento_old = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
             }
-            var oModel = this.getView().getModel("HabilitacionModel");
             oModel.updateBindings(true);
-            oModel.setProperty("/Busy", false);
-            this.LoadRegionesModel();
+            } catch (oException) {
+                console.error("### TRNS onBindingIntervenciones - excepcion procesando Intervenciones", oException);
+                MessageBox.error("Ha ocurrido un error al procesar los datos de la habilitación. Intente nuevamente.");
+            } finally {
+                oModel.setProperty("/Busy", false);
+                this.LoadRegionesModel();
+            }
+            // FIN MOD TRNS #PT-27
         },
         ShowButtonStatus: function (estado) {
             if (estado === "N" || estado === "P") {
