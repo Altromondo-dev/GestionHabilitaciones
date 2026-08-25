@@ -21,6 +21,9 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 		},
 		
 		_getGradoApto: function (oModel, SendCommentModel) {
+			if (!oModel.Hab_apmedico_nav || oModel.Hab_apmedico_nav.length === 0) {
+				return "-";
+			}
 			const gradosapt = SendCommentModel.find(element => element.Codigo === oModel.Hab_apmedico_nav[0].Gradoap);
 			if (gradosapt !== undefined){
 				return gradosapt.Grado;
@@ -103,15 +106,16 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 				Gerente_Reg_Nombre: oModelHab.Gerente_Reg_Nombre ? oModelHab.Gerente_Reg_Nombre : "-",
 				Gerente_Reg_Firma: FormatHelper.formatImage(oModelHab.SeguridadHigiene_Firma)
 			};
-			let gerPlanOperRed = {
-				Ger_Operaciones_Fecha: FormatHelper.formateDate(oModelHab.Ger_Operaciones_Fecha),
-				Ger_Operaciones_Anio_Venc: oModelHab.Ger_Operaciones_Anio_Venc ? oModelHab.Ger_Operaciones_Anio_Venc : "-",
-				Ger_Operaciones_Cantidad_Venc: oModelHab.Ger_Operaciones_Cantidad_Venc ? oModelHab.Ger_Operaciones_Cantidad_Venc : "-",
-				Ger_Operaciones_Tiempo_Venc: oModelHab.Ger_Operaciones_Tiempo_Venc ? oModelHab.Ger_Operaciones_Tiempo_Venc : "-",
-				Ger_Operaciones_Observacion: oModelHab.Ger_Operaciones_Observacion ? oModelHab.Ger_Operaciones_Observacion : "-",
-				Ger_Operaciones_Nombre: oModelHab.Ger_Operaciones_Nombre ? oModelHab.Ger_Operaciones_Nombre : "-",
-				Ger_Operaciones_Firma: FormatHelper.formatImage(oModelHab.Ger_Operaciones_Firma)
-			};
+			// GPOR (Gerencia de Planificación y Operación de la Red) - comentado porque fue removido del workflow
+			// let gerPlanOperRed = {
+			// 	Ger_Operaciones_Fecha: FormatHelper.formateDate(oModelHab.Ger_Operaciones_Fecha),
+			// 	Ger_Operaciones_Anio_Venc: oModelHab.Ger_Operaciones_Anio_Venc ? oModelHab.Ger_Operaciones_Anio_Venc : "-",
+			// 	Ger_Operaciones_Cantidad_Venc: oModelHab.Ger_Operaciones_Cantidad_Venc ? oModelHab.Ger_Operaciones_Cantidad_Venc : "-",
+			// 	Ger_Operaciones_Tiempo_Venc: oModelHab.Ger_Operaciones_Tiempo_Venc ? oModelHab.Ger_Operaciones_Tiempo_Venc : "-",
+			// 	Ger_Operaciones_Observacion: oModelHab.Ger_Operaciones_Observacion ? oModelHab.Ger_Operaciones_Observacion : "-",
+			// 	Ger_Operaciones_Nombre: oModelHab.Ger_Operaciones_Nombre ? oModelHab.Ger_Operaciones_Nombre : "-",
+			// 	Ger_Operaciones_Firma: FormatHelper.formatImage(oModelHab.Ger_Operaciones_Firma)
+			// };
 			let gestCalidad = {
 				ObservacionGestionCalidad: oModelHab.ObservacionGestionCalidad ? oModelHab.ObservacionGestionCalidad : "-",
 				Gestion_Calidad_Fecha_Habilitacion: FormatHelper.formateDate(oModelHab.Gestion_Calidad_Fecha_Habilitacion),
@@ -443,36 +447,35 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 				]
 			});
 			//---------------- fin Gerencia Regional / Jefatura COT - COTDT ---------------------------------------------//
-			//----------------- Gerencia de Planificación y Operación de la Red -----------------------------------------//
-			_contenido.push({
-				text: "\n" + "Gerencia de Planificación y Operación de la Red",
-				style: 'title'
-			});
-			// Evaluacion y clasificacion 3
-			let _gerPlanOperRed = [];
-			if (gerPlanOperRed.Ger_Operaciones_Firma !== "-") {
-				_gerPlanOperRed.push({
-					image: gerPlanOperRed.Ger_Operaciones_Firma,
-					fit: [150, 150],
-					style: 'signatureEntrenamiento'
-				});
-			}
-			_contenido.push({
-				columns: [{
-						width: 'auto',
-						text: "\n" +
-							"Fecha: " + gerPlanOperRed.Ger_Operaciones_Fecha + "\n" +
-							"Se recomienda otorgar la Licencia Habilitante por el término de: " + gerPlanOperRed.Ger_Operaciones_Anio_Venc + " " + "/" +
-							" " +
-							gerPlanOperRed.Ger_Operaciones_Cantidad_Venc + " " + "/" + " " + gerPlanOperRed.Ger_Operaciones_Tiempo_Venc + "\n" +
-							"Observaciones: " + gerPlanOperRed.Ger_Operaciones_Observacion + "\n" +
-							"Aclaración: " + gerPlanOperRed.Ger_Operaciones_Nombre + "\n" +
-							"Firma",
-						style: 'itemsColumn'
-					},
-					_gerPlanOperRed
-				]
-			});
+			//----------------- Gerencia de Planificación y Operación de la Red - comentado porque fue removido del workflow -----------------------------------------//
+			// _contenido.push({
+			// 	text: "\n" + "Gerencia de Planificación y Operación de la Red",
+			// 	style: 'title'
+			// });
+			// let _gerPlanOperRed = [];
+			// if (gerPlanOperRed.Ger_Operaciones_Firma !== "-") {
+			// 	_gerPlanOperRed.push({
+			// 		image: gerPlanOperRed.Ger_Operaciones_Firma,
+			// 		fit: [150, 150],
+			// 		style: 'signatureEntrenamiento'
+			// 	});
+			// }
+			// _contenido.push({
+			// 	columns: [{
+			// 			width: 'auto',
+			// 			text: "\n" +
+			// 				"Fecha: " + gerPlanOperRed.Ger_Operaciones_Fecha + "\n" +
+			// 				"Se recomienda otorgar la Licencia Habilitante por el término de: " + gerPlanOperRed.Ger_Operaciones_Anio_Venc + " " + "/" +
+			// 				" " +
+			// 				gerPlanOperRed.Ger_Operaciones_Cantidad_Venc + " " + "/" + " " + gerPlanOperRed.Ger_Operaciones_Tiempo_Venc + "\n" +
+			// 				"Observaciones: " + gerPlanOperRed.Ger_Operaciones_Observacion + "\n" +
+			// 				"Aclaración: " + gerPlanOperRed.Ger_Operaciones_Nombre + "\n" +
+			// 				"Firma",
+			// 			style: 'itemsColumn'
+			// 		},
+			// 		_gerPlanOperRed
+			// 	]
+			// });
 			//----------------- FIN Gerencia de Planificación y Operación de la Red -----------------------------------------//
 			//----------------- Gestión de la Calidad -----------------------------------------//
 			_contenido.push({
