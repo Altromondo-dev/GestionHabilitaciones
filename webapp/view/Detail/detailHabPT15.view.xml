@@ -1279,7 +1279,11 @@
 						<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}" text="{i18n>GuardarDatos}" />
 						-->
+						<!-- INI MOD TRNS #PT16 - "Guardar Datos" solo guarda el apto: queda solo para Salud Ocupacional (Medicina)
 						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGuardar'}" text="{i18n>GuardarDatos}" />
+						-->
+						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}" text="{i18n>GuardarDatos}" />
+						<!-- FIN MOD TRNS #PT16 -->
 						<!-- FIN MOD TRNS #XXXXXX -->
 						<Button icon="sap-icon://edit" press="onChangeStatus" visible="{ path: 'Habilitacion>/Estado', formatter: '.ShowButtonStatus'}" text="{i18n>CambiarEstado}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableChangeStatus'}" />
 					    <Button icon="sap-icon://print" press="_onDonwloadHabilitacion" text="{i18n>Imprimir}"/>

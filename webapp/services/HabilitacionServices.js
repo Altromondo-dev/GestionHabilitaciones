@@ -119,6 +119,39 @@ sap.ui.define([
                 success: onSuccessCallback,
                 error: onErrorCallback
             });
+        },
+
+        // INI MOD TRNS #PT16 - variantes solo para PT15 (H0003). loadHabilitacion y readOriginal quedan
+        // como estaban para MTO/TCT. El apto de PT15 viene en Hab_apmedicoPT15_nav (objeto o null).
+        loadHabilitacionPT15: function (idHabilitacion, oView, callback) {
+            var odataModel = oDataServices.getModel();
+            odataModel.read("/Habtecnicas2PT15Set", {
+                filters: [
+                    new sap.ui.model.Filter("Idhabilitacion", sap.ui.model.FilterOperator.EQ, idHabilitacion),
+                    new sap.ui.model.Filter("Clasehab", sap.ui.model.FilterOperator.EQ, "H0003")
+                ],
+                urlParameters: {
+                    "$expand": "Hab_apmedicoPT15_nav,Hab_SeguridadPublica_nav,Hab_SeguridadHigiene_nav,Hab_CETCT_nav,Hab_DesMantenimiento_nav"
+                },
+                success: jQuery.proxy(this.onSuccessCallback, this, oView, callback),
+                error: jQuery.proxy(this.onErrorCallback, this, callback)
+            });
+        },
+
+        readOriginalPT15: function (idHabilitacion, onSuccessCallback, onErrorCallback) {
+            var odataModel = oDataServices.getModel();
+            odataModel.read("/Habtecnicas2PT15Set", {
+                filters: [
+                    new sap.ui.model.Filter("Idhabilitacion", sap.ui.model.FilterOperator.EQ, idHabilitacion),
+                    new sap.ui.model.Filter("Clasehab", sap.ui.model.FilterOperator.EQ, "H0003")
+                ],
+                urlParameters: {
+                    "$expand": "Hab_apmedicoPT15_nav,Hab_SeguridadPublica_nav,Hab_SeguridadHigiene_nav,Hab_CETCT_nav,Hab_DesMantenimiento_nav"
+                },
+                success: onSuccessCallback,
+                error: onErrorCallback
+            });
         }
+        // FIN MOD TRNS #PT16
     };
 });

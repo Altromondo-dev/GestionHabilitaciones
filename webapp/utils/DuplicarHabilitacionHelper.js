@@ -162,17 +162,22 @@ sap.ui.define([
 
 		_readOriginal: function (oData) {
 			return new Promise(function (resolve, reject) {
-				HabilitacionServices.readOriginal(oData.Idhabilitacion, oData.Clasehab,
-					function (oResp) {
-						var oRec = oResp && oResp.results && oResp.results[0];
-						if (!oRec) {
-							reject(new Error("No se encontró la habilitación original " + oData.Idhabilitacion));
-							return;
-						}
-						resolve(oRec);
-					},
-					function (err) { reject(err); }
-				);
+				var fnOk = function (oResp) {
+					var oRec = oResp && oResp.results && oResp.results[0];
+					if (!oRec) {
+						reject(new Error("No se encontró la habilitación original " + oData.Idhabilitacion));
+						return;
+					}
+					resolve(oRec);
+				};
+				var fnErr = function (err) { reject(err); };
+				// INI MOD TRNS #PT16 - PT15 lee la original de Habtecnicas2PT15Set; MTO/TCT siguen por HabTecnicas2Set
+				if (oData.Clasehab === "H0003") {
+					HabilitacionServices.readOriginalPT15(oData.Idhabilitacion, fnOk, fnErr);
+					return;
+				}
+				// FIN MOD TRNS #PT16
+				HabilitacionServices.readOriginal(oData.Idhabilitacion, oData.Clasehab, fnOk, fnErr);
 			});
 		},
 
@@ -217,7 +222,9 @@ sap.ui.define([
 				"Empresaext": oFull.Empresaext,
 				"Lote": oFull.Lote || "",
 				"Empresa": oData.DestinoEmpresa,
-				"Hab_apmedico_nav": [],
+				// INI MOD TRNS #PT16 - Duplicar no manda apto; el POST sigue siendo deep por las demás navs
+				// "Hab_apmedico_nav": [],
+				// FIN MOD TRNS #PT16
 				"Hab_SeguridadPublica_nav": [],
 				"Hab_SeguridadHigiene_nav": [],
 				"Hab_CETCT_nav": [],

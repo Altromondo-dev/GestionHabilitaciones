@@ -312,7 +312,10 @@ sap.ui.define([
             var oView = this.getView();
 
             return new Promise((resolve, reject) => {
-                HabilitacionServices.loadHabilitacion(Idhabilitacion, "H0003", oView, function (error) {
+                // INI MOD TRNS #PT16 - PT15 se lee de Habtecnicas2PT15Set (con Hab_apmedicoPT15_nav)
+                // HabilitacionServices.loadHabilitacion(Idhabilitacion, "H0003", oView, function (error) {
+                HabilitacionServices.loadHabilitacionPT15(Idhabilitacion, oView, function (error) {
+                // FIN MOD TRNS #PT16
                     if (error) {
                         reject(error); 
                     } else {
@@ -355,7 +358,8 @@ sap.ui.define([
                 // } else if (roles.includes("MedicinaLaboral_PT15")) {
                 } else if (roles.includes("MedicinaLaboral_PT15") || roles.includes("hab_pt15_med-laboral")) {
                 // FIN MOD TRNS #XXXXXX
-                    oDataModel.Medicina_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS #PT16 - la sección de Medicina sale del apto (_cargarAptoMedico), no de la intervención
+                    /* oDataModel.Medicina_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                     oDataModel.Medicina_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Medicina_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.aptoMedicoVisible = true;
@@ -363,7 +367,8 @@ sap.ui.define([
                     if (Habilitacion.Hab_apmedico_nav && Habilitacion.Hab_apmedico_nav.length > 0) {
                         oDataModel.Gradoap = Habilitacion.Hab_apmedico_nav[0].Gradoap;
                         oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
-                    }
+                    } */
+                    // FIN MOD TRNS #PT16
                     /*	oDataModel.Medicina_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                         oDataModel.Medicina_Nombre = Intervenciones[row].Nombre;
                         oDataModel.Medicina_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
@@ -544,12 +549,15 @@ sap.ui.define([
                     // FIN MOD TRNS #XXXXXX
                 }
             }
-            if (ValidateAptoMedico === false && Habilitacion.Hab_apmedico_nav && Habilitacion.Hab_apmedico_nav.length > 0) {
+            // INI MOD TRNS #PT16
+            /* if (ValidateAptoMedico === false && Habilitacion.Hab_apmedico_nav && Habilitacion.Hab_apmedico_nav.length > 0) {
                 oDataModel.aptoMedicoVisible = false;
                 oDataModel.Gradoap = Habilitacion.Hab_apmedico_nav[0].Gradoap;
                 oDataModel.Medicina_Fecha_vencimiento = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
                 oDataModel.Medicina_Fecha_vencimiento_old = FormatHelper.formatJsonDate(Habilitacion.Hab_apmedico_nav[0].Vigencia);
-            }
+            } */
+            this._cargarAptoMedico();
+            // FIN MOD TRNS #PT16
             oModel.updateBindings(true);
             } catch (oException) {
                 console.error("### TRNS onBindingIntervenciones - excepcion procesando Intervenciones", oException);
@@ -560,6 +568,53 @@ sap.ui.define([
             }
             // FIN MOD TRNS #PT-27
         },
+        // INI MOD TRNS #PT16 - sección de Medicina a partir del apto (Hab_apmedicoPT15_nav, objeto o null).
+        // Qué apto llega lo decide el backend según el estado de la licencia; si viene null, los campos van en blanco.
+        // Fecha = apto.Fecha; Aclaración y Firma = FirmasUsuariosSet('<apto.Usuario>'); sin Usuario, en blanco.
+        _cargarAptoMedico: function () {
+            var that = this;
+            var oModel = this.getView().getModel("HabilitacionModel");
+            var oDataModel = oModel.getData();
+            var Habilitacion = this.getView().getModel("Habilitacion").getData();
+            var oApto = Habilitacion ? Habilitacion.Hab_apmedicoPT15_nav : null;
+            if (!oApto || oApto.__deferred) {
+                oApto = null;
+            }
+            oDataModel.Gradoap = oApto && oApto.GradoAp ? oApto.GradoAp : "";
+            oDataModel.Medicina_Fecha_vencimiento = oApto && oApto.Vigencia ? FormatHelper.formatJsonDate(oApto.Vigencia) : null;
+            oDataModel.Medicina_Fecha_vencimiento_old = oDataModel.Medicina_Fecha_vencimiento;
+            oDataModel.Medicina_Nombre = "";
+            oDataModel.Medicina_Firma = "";
+            oDataModel.Medicina_Fecha = null;
+            var sUsuario = oApto && oApto.Usuario ? oApto.Usuario : "";
+            this._sUsuarioFirmaApto = sUsuario;
+            if (!sUsuario) {
+                return;
+            }
+            oDataModel.Medicina_Fecha = oApto.Fecha ? FormatHelper.formatJsonDate(oApto.Fecha) : null;
+            FirmasUsuariosServices.loadSignatureByUser(sUsuario, function (data) {
+                if (that._sUsuarioFirmaApto !== sUsuario) {
+                    return;
+                }
+                oDataModel.Medicina_Nombre = data.UserName || "";
+                oDataModel.Medicina_Firma = that._formatFirma(data.Firma, data.FirmaType);
+                oModel.updateBindings(true);
+            }, function () {
+                // Sin firma registrada para el usuario: aclaración y firma quedan en blanco
+            });
+        },
+        // Imagen de la firma según FirmaType ("image/png" o "png"); sin tipo, el png que se usaba antes
+        _formatFirma: function (sFirma, sFirmaType) {
+            if (!sFirma) {
+                return "";
+            }
+            var sMime = "image/png";
+            if (sFirmaType) {
+                sMime = sFirmaType.indexOf("/") > -1 ? sFirmaType : "image/" + sFirmaType.toLowerCase();
+            }
+            return "data:" + sMime + ";base64," + sFirma;
+        },
+        // FIN MOD TRNS #PT16
         ShowButtonStatus: function (estado) {
             if (estado === "N" || estado === "P") {
                 return false;
@@ -753,7 +808,10 @@ sap.ui.define([
                 Puesto: habilitacion.Puesto,
                 Tipodoc: habilitacion.Tipodoc,
                 Tipohab: habilitacion.Tipohab,
-                Vigencia: habilitacion.Vigencia
+                // INI MOD TRNS #PT16 - sin vigencia de cabecera: el backend conserva la grabada
+                // Vigencia: habilitacion.Vigencia
+                Vigencia: null
+                // FIN MOD TRNS #PT16
             };
             //Motivo cambio de estado
             var MotivoCambioData = {
@@ -767,7 +825,11 @@ sap.ui.define([
             this.onCloseDialog();
             oModel.setProperty("/Busy", true);
             //Guardo el nuevo estado en la habilitacion
-            HabilitacionServices.saveHabilitacion(data,
+            // INI MOD TRNS #PT16 - POST plano (sin navs) a Habtecnicas2PT15Set, a propósito: el create plano
+            // tiene la lógica de cambio de estado de PT15
+            // HabilitacionServices.saveHabilitacion(data,
+            HabilitacionServices.saveHabilitacionPT15(data,
+            // FIN MOD TRNS #PT16
                 jQuery.proxy(this.onSuccessCallbackStatus, this),
                 jQuery.proxy(this.onErrorCallbackStatus, this)
             );
@@ -1014,6 +1076,20 @@ sap.ui.define([
             var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
             var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
             var Rol = Roles.find(element => element === "Director_Tecnico" || element === "Direccion_TecnicaMTO");
+            // INI MOD TRNS #PT16 - "Guardar Datos" es solo de Salud Ocupacional (Medicina) y exige grado
+            if (!this.onEnableMedLaboral(Roles, habilitacion.Estado)) {
+                MessageBox.alert("Solo Salud Ocupacional puede guardar el apto médico.", {
+                    title: "Error"
+                });
+                return;
+            }
+            if (!oModel.oData.Gradoap) {
+                MessageBox.alert("Debe ingresar el grado de aptitud.", {
+                    title: "Error"
+                });
+                return;
+            }
+            // FIN MOD TRNS #PT16
             var estadoNuevo = habilitacion.Estado;
             if (oModel.oData.Gradoap === "A" || oModel.oData.Gradoap === "B" || oModel.oData.Gradoap === "C") {
                 if (habilitacion.Estado !== 'S' && habilitacion.Estado !== 'D') {
@@ -1033,8 +1109,10 @@ sap.ui.define([
                         title: "Error"
                     });
                     return;
-                } else {
-                    habilitacion.Vigencia = oModel.oData.Medicina_Fecha_vencimiento;
+                // INI MOD TRNS #PT16 - el vencimiento del apto ya no pisa la vigencia de la licencia
+                /* } else {
+                    habilitacion.Vigencia = oModel.oData.Medicina_Fecha_vencimiento; */
+                // FIN MOD TRNS #PT16
                 }
             }
             var data = {
@@ -1060,13 +1138,30 @@ sap.ui.define([
                 Puesto: habilitacion.Puesto,
                 Tipodoc: habilitacion.Tipodoc,
                 Tipohab: habilitacion.Tipohab,
-                Vigencia: habilitacion.Vigencia,
+                // INI MOD TRNS #PT16 - sin vigencia de cabecera; el apto va por Hab_apmedicoPT15_nav (objeto).
+                // Las demás navs van en [] para que el POST sea siempre deep (el backend no graba nada con ellas).
+                /* Vigencia: habilitacion.Vigencia,
                 Hab_apmedico_nav: [{
                     "Legajo": habilitacion.Legajo,
                     "Vigencia": oModel.oData.Medicina_Fecha_vencimiento,
                     "Observaciones": "Sin observaciones",
                     "Gradoap": oModel.oData.Gradoap
-                }]
+                }] */
+                Vigencia: null,
+                Hab_apmedicoPT15_nav: {
+                    "Empresa": habilitacion.Empresa,
+                    "ClaseHab": "H0003",
+                    "Legajo": habilitacion.Legajo,
+                    "GradoAp": oModel.oData.Gradoap,
+                    "Vigencia": oModel.oData.Medicina_Fecha_vencimiento,
+                    "Observaciones": "Sin observaciones"
+                },
+                Hab_SeguridadPublica_nav: [],
+                Hab_SeguridadHigiene_nav: [],
+                Hab_CETCT_nav: [],
+                Hab_DesMantenimiento_nav: [],
+                Hab_Intervenciones_nav: []
+                // FIN MOD TRNS #PT16
             };
             //Motivo cambio de estado
             var MotivoCambioData = {
@@ -1079,16 +1174,29 @@ sap.ui.define([
             };
             oModel.setProperty("/Busy", true);
             //Guardo el nuevo estado en la habilitacion
-            HabilitacionServices.saveHabilitacion(data,
+            // INI MOD TRNS #PT16 - POST deep a Habtecnicas2PT15Set; al terminar se recarga el detalle
+            // para que pantalla e impresión muestren el apto grabado
+            /* HabilitacionServices.saveHabilitacion(data,
                 jQuery.proxy(this.onSuccessCallbackStatus, this),
                 jQuery.proxy(this.onErrorCallbackStatus, this)
+            ); */
+            HabilitacionServices.saveHabilitacionPT15(data,
+                jQuery.proxy(this.onSuccessCallbackUpdateData, this, habilitacion.Idhabilitacion),
+                jQuery.proxy(this.onErrorCallbackStatus, this)
             );
+            // FIN MOD TRNS #PT16
             //Guardo motivo de cambio de estado
             MotivoCambioEstadoService.saveMotivo(MotivoCambioData,
                 jQuery.proxy(this.onSuccessCallbackMotivo, this),
                 jQuery.proxy(this.onErrorCallbackMotivo, this)
             );
         },
+        // INI MOD TRNS #PT16
+        onSuccessCallbackUpdateData: function (sIdhabilitacion) {
+            this.onSuccessCallbackStatus();
+            this.LoadIntervenciones(sIdhabilitacion);
+        },
+        // FIN MOD TRNS #PT16
         successIntCallback: function (data) {
             var HabilitacionModel = this.getView().getModel("HabilitacionModel").getData();
             var gradoAp = {

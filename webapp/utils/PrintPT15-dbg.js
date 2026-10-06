@@ -21,10 +21,15 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 		},
 		
 		_getGradoApto: function (oModel, SendCommentModel) {
-			if (!oModel.Hab_apmedico_nav || oModel.Hab_apmedico_nav.length === 0) {
+			// INI MOD TRNS #PT16 - el apto de PT15 viene en Hab_apmedicoPT15_nav (objeto o null)
+			// if (!oModel.Hab_apmedico_nav || oModel.Hab_apmedico_nav.length === 0) {
+			const oApto = oModel.Hab_apmedicoPT15_nav;
+			if (!oApto || oApto.__deferred || !oApto.GradoAp) {
 				return "-";
 			}
-			const gradosapt = SendCommentModel.find(element => element.Codigo === oModel.Hab_apmedico_nav[0].Gradoap);
+			// const gradosapt = SendCommentModel.find(element => element.Codigo === oModel.Hab_apmedico_nav[0].Gradoap);
+			const gradosapt = SendCommentModel.find(element => element.Codigo === oApto.GradoAp);
+			// FIN MOD TRNS #PT16
 			if (gradosapt !== undefined){
 				return gradosapt.Grado;
 			} else {
@@ -283,7 +288,10 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// ----------- FIN Evaluación del Desempeño en la Operación  ----------------------------------------//
 			// -------   Medicina Laboral ---------------------------------------------------------------------- //
 			_contenido.push({
-				text: "\n" + "Medicina Laboral",
+				// INI MOD TRNS #PT16
+				// text: "\n" + "Medicina Laboral",
+				text: "\n" + "Salud Ocupacional",
+				// FIN MOD TRNS #PT16
 				style: 'title'
 			});
 			let _medicinaLaboral = [];
