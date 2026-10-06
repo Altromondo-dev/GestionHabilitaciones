@@ -619,7 +619,15 @@ sap.ui.define([
                     // oDataModel.Direccion_Tecnica_Observacion = Intervenciones[row].Datosadicionales;
                     var extraDataDT = {};
                     if (Intervenciones[row].Datosadicionales && Intervenciones[row].Datosadicionales.trim() !== "") {
-                        extraDataDT = JSON.parse(Intervenciones[row].Datosadicionales);
+                        // INI MOD TRNS #PT16 - el rechazo desde el Inbox graba la observacion como texto plano
+                        // (no JSON); JSON.parse lanzaba SyntaxError y cortaba la carga del detalle.
+                        // extraDataDT = JSON.parse(Intervenciones[row].Datosadicionales);
+                        try {
+                            extraDataDT = JSON.parse(Intervenciones[row].Datosadicionales) || {};
+                        } catch (oErrParse) {
+                            extraDataDT = { Ger_Operaciones_Observacion: Intervenciones[row].Datosadicionales };
+                        }
+                        // FIN MOD TRNS #PT16
                     }
                     oDataModel.Direccion_Tecnica_Observacion = extraDataDT.Ger_Operaciones_Observacion;
                     // FIN MOD TRNS #XXXXXX
