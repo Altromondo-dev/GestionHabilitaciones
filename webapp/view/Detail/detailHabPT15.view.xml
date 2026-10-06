@@ -289,9 +289,15 @@
 										<HBox width="100%" class="marginTopTitle" justifyContent="SpaceBetween">
 											<items>
 												<Title text="{i18n>MedicinaLaboral}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
+												<!-- INI MOD TRNS #PT-18 - el enabled migro de onEnableRol3 (deprecado) a onEnableMedLaboral -->
 												<u:FileUploader class="fileUploader" tooltip="Adjuntar Archivo." buttonText="Adjuntar Archivo" buttonOnly="true" change="onChangeFile"
 													icon="sap-icon://attachment"
-													enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}"></u:FileUploader>
+													enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}"></u:FileUploader>
+												<!-- FIN MOD TRNS #PT-18 -->
+												<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
+												<Button icon="sap-icon://save" press="onGuardarMedLaboral" text="{i18n>GuardarDatos}"
+													enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}"/>
+												<!-- FIN MOD TRNS #PT-18 -->
 											</items>
 										</HBox>
 										<VBox class="colorGray">
@@ -369,6 +375,10 @@
 										<HBox width="100%" class="marginTopTitle" justifyContent="SpaceBetween">
 											<items>
 												<Title text="{i18n>SeguridadHigiene}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
+												<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
+												<Button icon="sap-icon://save" press="onGuardarSegHig" text="{i18n>GuardarDatos}"
+													enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"/>
+												<!-- FIN MOD TRNS #PT-18 -->
 											</items>
 										</HBox>
 										<VBox class="colorGray">
@@ -386,7 +396,7 @@
 																		<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/aprobadoCheck}" text="Si" editable="false">
 																		-->
-																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/aprobadoCheck}" text="Si" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																		<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/aprobadoCheck}" select="onSelectApprobate" text="Si" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
 																		<!-- FIN MOD TRNS #XXXXXX -->
 																			<layoutData>
 																				<l:GridData span="L1 M1 S4"/>
@@ -862,6 +872,14 @@
 																		</layoutData>
 																	</Image>
 																</f:FormElement>
+																<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
+																<f:FormElement>
+																	<f:fields>
+																		<Button icon="sap-icon://save" press="onGuardarGerReg" text="{i18n>GuardarDatos}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}"/>
+																	</f:fields>
+																</f:FormElement>
+																<!-- FIN MOD TRNS #PT-18 -->
 															</f:formElements>
 														</f:FormContainer>
 													</f:formContainers>
@@ -1031,6 +1049,14 @@
 																		<Image class="signatureBackground" src="{HabilitacionModel>/Gestion_Calidad_Firma}" height="70px" width="200px"/>
 																	</f:fields>
 																</f:FormElement>
+																<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
+																<f:FormElement>
+																	<f:fields>
+																		<Button icon="sap-icon://save" press="onGuardarGestCalidad" text="{i18n>GuardarDatos}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGestCalidad'}"/>
+																	</f:fields>
+																</f:FormElement>
+																<!-- FIN MOD TRNS #PT-18 -->
 															</f:formElements>
 														</f:FormContainer>
 													</f:formContainers>
@@ -1091,6 +1117,14 @@
 																<f:FormElement label="{i18n>Firma}">
 																	<Image class="signatureBackground" src="{HabilitacionModel>/Rep_Direccion_Firma}" height="70px" width="200px"/>
 																</f:FormElement>
+																<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
+																<f:FormElement>
+																	<f:fields>
+																		<Button icon="sap-icon://save" press="onGuardarRepDireccion" text="{i18n>GuardarDatos}"
+																			enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRepDireccion'}"/>
+																	</f:fields>
+																</f:FormElement>
+																<!-- FIN MOD TRNS #PT-18 -->
 															</f:formElements>
 														</f:FormContainer>
 													</f:formContainers>
@@ -1276,11 +1310,9 @@
 				<footer>
 					<Toolbar>
 						<ToolbarSpacer/>
-						<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
-						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}" text="{i18n>GuardarDatos}" />
-						-->
-						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGuardar'}" text="{i18n>GuardarDatos}" />
-						<!-- FIN MOD TRNS #XXXXXX -->
+						<!-- INI MOD TRNS #PT-18 - el boton unico de Guardar se reemplazo por un boton por seccion,
+						     cada uno junto a los campos que edita y habilitado por su propio formatter. -->
+						<!-- FIN MOD TRNS #PT-18 -->
 						<Button icon="sap-icon://edit" press="onChangeStatus" visible="{ path: 'Habilitacion>/Estado', formatter: '.ShowButtonStatus'}" text="{i18n>CambiarEstado}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableChangeStatus'}" />
 					    <Button icon="sap-icon://print" press="_onDonwloadHabilitacion" text="{i18n>Imprimir}"/>
 					</Toolbar>

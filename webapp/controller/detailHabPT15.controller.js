@@ -22,7 +22,14 @@ sap.ui.define([
     FirmasUsuariosServices, AdjuntosServices, MotivoCambioEstadoService, TipoHabilitacionServices) {
     "use strict";
     return Controller.extend("transener.GestionHabilitaciones.controller.detailHabPT15", {
-     
+
+        // INI MOD TRNS #PT-18 - estados en los que se permite editar las secciones de PT15.
+        // Definicion funcional: N (Nueva Habilitacion), P (Pendiente Gestion de Calidad),
+        // H (Habilitado) y S (Suspendido). Quedan bloqueados C (Cancelado), D (Revocado)
+        // y F (Finalizado). Es la MISMA lista para las cinco secciones; si alguna necesita
+        // otra, parametrizar por seccion a partir de aca.
+        ESTADOS_EDITABLES_PT15: ["N", "P", "H", "S"],
+        // FIN MOD TRNS #PT-18
 
         onInit: function () {
 
@@ -334,6 +341,16 @@ sap.ui.define([
             // INI MOD TRNS #PT-27 - defensa en profundidad: try/catch/finally para que una excepcion en el procesamiento no deje el busy colgado
             var oModel = this.getView().getModel("HabilitacionModel");
             try {
+            // INI MOD TRNS #PT-18 - cada edicion de un rol crea una intervencion NUEVA (nunca se sobrescribe),
+            // asi que por rol puede haber N filas. La vista muestra la MAS RECIENTE; el resto es historial.
+            // El maximo se calcula explicitamente por Fechaint+Horaint, sin depender del orden de llegada.
+            var oAgrupado = this._agruparUltimaPorRol(Intervenciones);
+            oModel.setProperty("/HistorialPorRol", oAgrupado.historial);
+            // Fechacreacion forma parte de la PK de ZTAB_APROB_HAB: al crear una intervencion nueva hay que
+            // reenviar LA MISMA de las filas existentes de esta habilitacion, no la fecha de hoy.
+            oDataModel.Fechacreacion = this._resolverFechacreacion(Intervenciones);
+            Intervenciones = oAgrupado.ultimas;
+            // FIN MOD TRNS #PT-18
             for (var row in Intervenciones) {
                 var roles = Intervenciones[row].Rol;
                 if (roles.includes("SOLICITANTE_PT15")) {
@@ -376,50 +393,109 @@ sap.ui.define([
                 // } else if (roles.includes("seguridadH_PT15")) {
                 } else if (roles.includes("seguridadH_PT15") || roles.includes("hab_pt15_seg-hig")) {
                 // FIN MOD TRNS #XXXXXX
-                    if (Intervenciones[row].Datosadicionales !== "Examen Reprobado") {
+                    // INI MOD TRNS #27.2 DEF-001 - misma regla que habilitacionespt15/Main.controller.js:
+                    // (a) el guard "Examen Reprobado" descartaba la intervencion de reprobacion entera
+                    //     (firma, nombre, fecha, contador y radios): la seccion C) quedaba en blanco.
+                    // (b) APROBADO se persiste vacio tanto para "No" como para "sin responder", asi que
+                    //     un examen reprobado se distingue por APROBADO vacio + CONTADOR > 0. La regla
+                    //     anterior (bEvaluado: APROBADO no vacio) dejaba los dos radios sin tildar.
+                    // (c) firma/nombre/fecha solo se asignan si la intervencion trae firma, para que una
+                    //     intervencion sin firma no pise a otra que si la tiene.
+                    // (d) la fecha de examen se muestra exista o no aprobacion; el parseo de vencimiento
+                    //     queda condicionado a aprobado (la intervencion de reprobacion no trae
+                    //     SeguridadHigiene_Fecha_Venc: daba Invalid Date / NaN).
+                    // if (Intervenciones[row].Datosadicionales !== "Examen Reprobado") {
+                    //     oDataModel.SeguridadHigiene_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    //     oDataModel.SeguridadHigiene_Nombre = Intervenciones[row].Nombre;
+                    //     oDataModel.SeguridadHigiene_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
+                    //     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
+                    //     if (Habilitacion.Hab_SeguridadHigiene_nav[0]) {
+                    //         oDataModel.CountEvaluation = Habilitacion.Hab_SeguridadHigiene_nav[0].Contador;
+                    //         // INI MOD TRNS #XXXXXX - tildar "No" cuando el examen no esta aprobado.
+                    //         // Antes solo se seteaba aprobadoCheck: con Aprobado = false los dos radios
+                    //         // quedaban sin tilde y el examen reprobado se veia como "sin evaluar".
+                    //         // oDataModel.aprobadoCheck = Habilitacion.Hab_SeguridadHigiene_nav[0].Aprobado;
+                    //         var vAprobado = Habilitacion.Hab_SeguridadHigiene_nav[0].Aprobado;
+                    //         var bEvaluado = (vAprobado !== undefined && vAprobado !== null && vAprobado !== "");
+                    //         oDataModel.aprobadoCheck = (vAprobado === true || vAprobado === "true" || vAprobado === "X");
+                    //         oDataModel.reprobadoCheck = bEvaluado && !oDataModel.aprobadoCheck;
+                    //         // FIN MOD TRNS #XXXXXX
+                    //         oDataModel.SeguridadHigiene_Fecha_examen = FormatHelper.formatJsonDate(Habilitacion.Hab_SeguridadHigiene_nav[0].Vigencia);
+                    //     }
+                    if (Intervenciones[row].Firma) {
                         oDataModel.SeguridadHigiene_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
                         oDataModel.SeguridadHigiene_Nombre = Intervenciones[row].Nombre;
                         oDataModel.SeguridadHigiene_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
-                        //var Habilitacion = this.getView().getModel("Habilitacion").getData();
-                        if (Habilitacion.Hab_SeguridadHigiene_nav[0]) {
-                            oDataModel.CountEvaluation = Habilitacion.Hab_SeguridadHigiene_nav[0].Contador;
-                            oDataModel.aprobadoCheck = Habilitacion.Hab_SeguridadHigiene_nav[0].Aprobado;
-                            oDataModel.SeguridadHigiene_Fecha_examen = FormatHelper.formatJsonDate(Habilitacion.Hab_SeguridadHigiene_nav[0].Vigencia);
-                        }
+                    }
+                    var oSegHig = (Habilitacion.Hab_SeguridadHigiene_nav && Habilitacion.Hab_SeguridadHigiene_nav.length > 0) ?
+                        Habilitacion.Hab_SeguridadHigiene_nav[0] : null;
+                    oDataModel.CountEvaluation = oSegHig ? Number(oSegHig.Contador) || 0 : 0;
+                    var bAprobado = !!oSegHig && (oSegHig.Aprobado === true || oSegHig.Aprobado === "X");
+                    oDataModel.aprobadoCheck = bAprobado;
+                    oDataModel.reprobadoCheck = !!oSegHig && !bAprobado && oDataModel.CountEvaluation > 0;
+                    if (oSegHig) {
+                        oDataModel.SeguridadHigiene_Fecha_examen = FormatHelper.formatJsonDate(oSegHig.Vigencia);
+                    }
+                    if (bAprobado) {
                         if (Intervenciones[row].Datosadicionales != "") { //Pongo esto porque estan explotando licencias...
                             var extraData = JSON.parse(Intervenciones[row].Datosadicionales);
                             oDataModel.SeguridadHigiene_Fecha_Venc = new Date(extraData.SeguridadHigiene_Fecha_Venc);
                             oDataModel.SeguridadHigiene_Observacion = extraData.SeguridadHigiene_Observacion;
-                            oDataModel.SeguridadHigiene_Anio_Venc = String(oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha
-                                .getFullYear());
-                            //Agrego esto porque no trae bien el termino cuando selecciona mes o dias
-                            if (oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() !== oDataModel.SeguridadHigiene_Fecha.getMonth() || oDataModel.SeguridadHigiene_Fecha_Venc
-                                .getDate() !== oDataModel.SeguridadHigiene_Fecha.getDate()) {
-                                //Difiere el mes o el día? entonces no seleccionó año, seleccionó "Otros"
-                                oDataModel.SeguridadHigiene_Anio_Venc = "0";
+                            // INI MOD TRNS #TP-64 - leer el término real persistido (extraData.SeguridadHigiene_Anio_Venc)
+                            // en vez de "adivinarlo" comparando fechas: esa comparación confundía cualquier
+                            // múltiplo exacto de 12 meses (ej. 96 meses = 8 años) con un término de año fijo.
+                            // El cálculo por fechas queda solo como fallback para intervenciones guardadas
+                            // antes de este fix, que no tienen el término persistido.
+                            // oDataModel.SeguridadHigiene_Anio_Venc = String(oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha
+                            //     .getFullYear());
+                            // //Agrego esto porque no trae bien el termino cuando selecciona mes o dias
+                            // if (oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() !== oDataModel.SeguridadHigiene_Fecha.getMonth() || oDataModel.SeguridadHigiene_Fecha_Venc
+                            //     .getDate() !== oDataModel.SeguridadHigiene_Fecha.getDate()) {
+                            //     //Difiere el mes o el día? entonces no seleccionó año, seleccionó "Otros"
+                            //     oDataModel.SeguridadHigiene_Anio_Venc = "0";
+                            // }
+                            if (extraData.SeguridadHigiene_Anio_Venc !== undefined) {
+                                oDataModel.SeguridadHigiene_Anio_Venc = extraData.SeguridadHigiene_Anio_Venc;
+                            } else {
+                                oDataModel.SeguridadHigiene_Anio_Venc = String(oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha
+                                    .getFullYear());
+                                //Agrego esto porque no trae bien el termino cuando selecciona mes o dias
+                                if (oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() !== oDataModel.SeguridadHigiene_Fecha.getMonth() || oDataModel.SeguridadHigiene_Fecha_Venc
+                                    .getDate() !== oDataModel.SeguridadHigiene_Fecha.getDate()) {
+                                    //Difiere el mes o el día? entonces no seleccionó año, seleccionó "Otros"
+                                    oDataModel.SeguridadHigiene_Anio_Venc = "0";
+                                }
                             }
+                            // FIN MOD TRNS #TP-64
                         }
                         if (oDataModel.SeguridadHigiene_Anio_Venc === "0") {
-                            var Diferencia = oDataModel.SeguridadHigiene_Fecha_Venc.getTime() - oDataModel.SeguridadHigiene_Fecha.getTime();
-                            Diferencia = Math.abs(Diferencia);
-                            var Dias = Math.floor(Diferencia / (1000 * 60 * 60 * 24));
-                            //Si coincide el día, va el mes
-                            if (oDataModel.SeguridadHigiene_Fecha_Venc.getDate() === oDataModel.SeguridadHigiene_Fecha.getDate()) {
-                                var oTime = oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() - oDataModel.SeguridadHigiene_Fecha.getMonth();
-                                if (oTime < 0) {
-                                    oTime = Math.abs(oTime);
-                                }
-                                oDataModel.SeguridadHigiene_Tiempo_Venc = "Mes";
-                                oDataModel.SeguridadHigiene_Cantidad_Venc = oTime;
+                            // INI MOD TRNS #TP-64 - leer Cantidad_Venc/Tiempo_Venc directo de Datosadicionales
+                            // en vez de reconstruirlos por diferencia de fechas. El cálculo viejo (abajo, ahora
+                            // fallback) solo usaba "oTime" -el resto del mes dentro del año- sin sumar los años
+                            // completos transcurridos: por eso, p.ej., 97 meses se mostraba como "1".
+                            if (typeof extraData !== "undefined" && extraData.SeguridadHigiene_Cantidad_Venc !== undefined && extraData.SeguridadHigiene_Tiempo_Venc) {
+                                oDataModel.SeguridadHigiene_Cantidad_Venc = extraData.SeguridadHigiene_Cantidad_Venc;
+                                oDataModel.SeguridadHigiene_Tiempo_Venc = extraData.SeguridadHigiene_Tiempo_Venc;
                             } else {
-                                oDataModel.SeguridadHigiene_Tiempo_Venc = "Dia";
-                                // INI MOD TRNS #PT-27 - DiasSegHig no estaba declarada, la variable correcta es Dias
-                                // oDataModel.SeguridadHigiene_Cantidad_Venc = DiasSegHig;
-                                oDataModel.SeguridadHigiene_Cantidad_Venc = Dias;
-                                // FIN MOD TRNS #PT-27
+                                // Fallback para intervenciones guardadas antes de este fix
+                                var Diferencia = oDataModel.SeguridadHigiene_Fecha_Venc.getTime() - oDataModel.SeguridadHigiene_Fecha.getTime();
+                                Diferencia = Math.abs(Diferencia);
+                                var Dias = Math.floor(Diferencia / (1000 * 60 * 60 * 24));
+                                //Si coincide el día, va el mes
+                                if (oDataModel.SeguridadHigiene_Fecha_Venc.getDate() === oDataModel.SeguridadHigiene_Fecha.getDate()) {
+                                    var oTime = oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() - oDataModel.SeguridadHigiene_Fecha.getMonth();
+                                    var anios = oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha.getFullYear();
+                                    oDataModel.SeguridadHigiene_Tiempo_Venc = "Mes";
+                                    oDataModel.SeguridadHigiene_Cantidad_Venc = oTime + anios * 12;
+                                } else {
+                                    oDataModel.SeguridadHigiene_Tiempo_Venc = "Dia";
+                                    oDataModel.SeguridadHigiene_Cantidad_Venc = Dias;
+                                }
                             }
+                            // FIN MOD TRNS #TP-64
                         }
                     }
+                    // FIN MOD TRNS #27.2 DEF-001
                 } else if (roles.includes("Examinador1")) {
                     oDataModel.Examinador1_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Examinador1_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
@@ -560,6 +636,85 @@ sap.ui.define([
             }
             // FIN MOD TRNS #PT-27
         },
+
+        // INI MOD TRNS #PT-18 - agrupado de intervenciones por rol
+        // Misma clasificacion (y el MISMO orden de evaluacion) que la cadena if/else de
+        // onBindingIntervenciones: el match es por substring y hay prefijos que se solapan
+        // (p.ej. "Ger_Operaciones" vs "hab_pt15_ger-operacion"), asi que el orden importa.
+        _CLASIFICACION_ROLES: [
+            { clave: "SOLICITANTE", patrones: ["SOLICITANTE_PT15"] },
+            { clave: "HABILITADO", patrones: ["Habilitado_PT15"] },
+            { clave: "COT", patrones: ["COT_COTDT_PT15", "hab_pt15_cot"] },
+            { clave: "MED_LABORAL", patrones: ["MedicinaLaboral_PT15", "hab_pt15_med-laboral"] },
+            { clave: "SEG_HIG", patrones: ["seguridadH_PT15", "hab_pt15_seg-hig"] },
+            { clave: "EXAMINADOR1", patrones: ["Examinador1"] },
+            { clave: "EXAMINADOR2", patrones: ["Examinador2"] },
+            { clave: "EXAMINADOR3", patrones: ["Examinador3"] },
+            { clave: "GER_REG", patrones: ["Ger_Reg_Jefe_COT", "hab_pt15_ger-reg-jefe-cot"] },
+            { clave: "GER_OPERACIONES", patrones: ["Ger_Operaciones"] },
+            { clave: "GEST_CALIDAD", patrones: ["Gestion_Calidad_PT152", "hab_pt15_gest-calidad"] },
+            { clave: "REP_DIRECCION", patrones: ["Rep_Direccion_PT15", "hab_pt15_rep-direccion"] },
+            { clave: "DIRECCION_TECNICA", patrones: ["Direccion_TecnicaPT15", "hab_pt15_ger-operacion"] }
+        ],
+
+        _claveDeRol: function (sRol) {
+            if (!sRol) { return null; }
+            var oMatch = this._CLASIFICACION_ROLES.find(function (oCfg) {
+                return oCfg.patrones.some(function (sPatron) {
+                    return sRol.indexOf(sPatron) !== -1;
+                });
+            });
+            return oMatch ? oMatch.clave : null;
+        },
+
+        // Clave de orden = ms de Fechaint (Edm.DateTime -> Date) + ms de Horaint (Edm.Time -> {ms}).
+        _claveOrdenIntervencion: function (oInt) {
+            var t = 0;
+            if (oInt.Fechaint) {
+                t += (oInt.Fechaint instanceof Date) ? oInt.Fechaint.getTime() : new Date(oInt.Fechaint).getTime();
+            }
+            if (oInt.Horaint && typeof oInt.Horaint === "object" && oInt.Horaint.ms != null) {
+                t += oInt.Horaint.ms;
+            }
+            return t;
+        },
+
+        // Devuelve { ultimas: [fila mas reciente de cada rol], historial: { clave: [filas DESC] } }.
+        // Las filas cuyo Rol no matchea ninguna clave se descartan (la cadena if/else tampoco las usa).
+        _agruparUltimaPorRol: function (aInt) {
+            var that = this;
+            var oHistorial = {};
+            (aInt || []).forEach(function (oInt) {
+                var sClave = that._claveDeRol(oInt.Rol);
+                if (!sClave) { return; }
+                if (!oHistorial[sClave]) { oHistorial[sClave] = []; }
+                oHistorial[sClave].push(oInt);
+            });
+            var aUltimas = [];
+            Object.keys(oHistorial).forEach(function (sClave) {
+                oHistorial[sClave].sort(function (a, b) {
+                    return that._claveOrdenIntervencion(b) - that._claveOrdenIntervencion(a);
+                });
+                aUltimas.push(oHistorial[sClave][0]);
+            });
+            return { ultimas: aUltimas, historial: oHistorial };
+        },
+
+        // Fechacreacion de la habilitacion: la comparten todas las filas de ZTAB_APROB_HAB de esta
+        // habilitacion. Se toma de la fila mas reciente que la traiga; si ninguna la trae, hoy.
+        _resolverFechacreacion: function (aInt) {
+            var that = this;
+            var aConFecha = (aInt || []).filter(function (oInt) {
+                return !!oInt.Fechacreacion;
+            });
+            if (!aConFecha.length) { return new Date(); }
+            aConFecha.sort(function (a, b) {
+                return that._claveOrdenIntervencion(b) - that._claveOrdenIntervencion(a);
+            });
+            return aConFecha[0].Fechacreacion;
+        },
+        // FIN MOD TRNS #PT-18
+
         ShowButtonStatus: function (estado) {
             if (estado === "N" || estado === "P") {
                 return false;
@@ -873,46 +1028,66 @@ sap.ui.define([
             return String(vUO).trim();
         },
 
-        _tieneRolGlobal: function (vRoles, aNombres) {
+        // INI MOD TRNS #PT-18 - los resolvers devuelven el LITERAL del grupo de IAS (no un booleano):
+        // ese string es el que se guarda en el campo ROL de la intervencion, tal cual, con sufijo de region.
+        _resolverRolGlobal: function (vRoles, aNombres) {
             var aRoles = this._normalizarRoles(vRoles);
-            return aNombres.some(function (s) {
+            var sMatch = aNombres.find(function (s) {
                 return aRoles.indexOf(s) !== -1;   // match EXACTO
             });
+            return sMatch || null;
         },
 
-        _tieneRolRegional: function (vRoles, sPrefijo, vUO, aLegacy) {
+        _resolverRolRegional: function (vRoles, sPrefijo, vUO, aLegacy) {
             var aRoles  = this._normalizarRoles(vRoles);
             var sUO     = this._normalizarUO(vUO);
             var sEsperado = sPrefijo + "_" + sUO;
 
-            var bMatch = aRoles.indexOf(sEsperado) !== -1;
+            if (aRoles.indexOf(sEsperado) !== -1) {
+                return sEsperado;
+            }
 
             // Fallback tolerante a ceros a la izquierda / padding
-            if (!bMatch && sUO) {
-                var sUOsinCeros = sUO.replace(/^0+/, "");
-                bMatch = aRoles.indexOf(sPrefijo + "_" + sUOsinCeros) !== -1;
+            if (sUO) {
+                var sSinCeros = sPrefijo + "_" + sUO.replace(/^0+/, "");
+                if (aRoles.indexOf(sSinCeros) !== -1) {
+                    return sSinCeros;
+                }
             }
 
             // Roles legacy sin region (compatibilidad hacia atras)
-            if (!bMatch && aLegacy && aLegacy.length) {
-                bMatch = this._tieneRolGlobal(aRoles, aLegacy);
+            if (aLegacy && aLegacy.length) {
+                return this._resolverRolGlobal(aRoles, aLegacy);
             }
 
-            console.log("### TRNS-DIAG regional | prefijo:", sPrefijo,
-                        "| UO:", JSON.stringify(sUO),
-                        "| esperado:", sEsperado,
-                        "| roles:", JSON.stringify(aRoles),
-                        "| match:", bMatch);
-            return bMatch;
+            return null;
         },
 
-        _estadoPermiteEdicion: function (vEstado) {
-            // PENDIENTE DEFINICION FUNCIONAL (Ivan): misma regla que
-            // onEnableRol3. Si alguna seccion necesita otra lista,
-            // parametrizar aca.
-            var aBloqueados = ["C", "D", "F", "N"];
-            return aBloqueados.indexOf(this._normalizarUO(vEstado)) === -1;
+        _tieneRolGlobal: function (vRoles, aNombres) {
+            return this._resolverRolGlobal(vRoles, aNombres) !== null;
         },
+
+        _tieneRolRegional: function (vRoles, sPrefijo, vUO, aLegacy) {
+            return this._resolverRolRegional(vRoles, sPrefijo, vUO, aLegacy) !== null;
+        },
+        // FIN MOD TRNS #PT-18
+
+        // INI MOD TRNS #PT-18 - definicion funcional cerrada: lista de PERMITIDOS (ver
+        // ESTADOS_EDITABLES_PT15 al tope). Antes era una lista de bloqueados heredada de
+        // onEnableRol3 que incluia "N", y "N" es el estado en el que corre todo el workflow:
+        // eso dejaba las cinco secciones de solo lectura justo cuando hay que cargarlas.
+        // Cambio de comportamiento: con Estado vacio o desconocido ahora devuelve false
+        // (antes true). Ningun camino del frontend produce un Estado vacio; la unica ventana
+        // en que llega undefined es antes de que cargue el modelo Habilitacion, y se corrige
+        // sola cuando HabilitacionServices hace setModel y revalua los bindings.
+        // _estadoPermiteEdicion: function (vEstado) {
+        //     var aBloqueados = ["C", "D", "F", "N"];
+        //     return aBloqueados.indexOf(this._normalizarUO(vEstado)) === -1;
+        // },
+        _estadoPermiteEdicion: function (vEstado) {
+            return this.ESTADOS_EDITABLES_PT15.indexOf(this._normalizarUO(vEstado)) !== -1;
+        },
+        // FIN MOD TRNS #PT-18
 
         // GLOBALES (sin region)
         onEnableMedLaboral: function (vRoles, vEstado) {
@@ -946,15 +1121,8 @@ sap.ui.define([
                 ["Gestion_Calidad_PT152", "Gestion_Calidad_PT15"]);
         },
 
-        // Habilita el boton Guardar si el usuario puede editar
-        // AL MENOS una seccion
-        onEnableGuardar: function (vRoles, vUO, vEstado) {
-            return this.onEnableMedLaboral(vRoles, vEstado)
-                || this.onEnableRepDireccion(vRoles, vEstado)
-                || this.onEnableSegHig(vRoles, vUO, vEstado)
-                || this.onEnableGerReg(vRoles, vUO, vEstado)
-                || this.onEnableGestCalidad(vRoles, vUO, vEstado);
-        },
+        // ELIMINADA TRNS #PT-18 - onEnableGuardar habilitaba el boton unico del footer si el usuario
+        // podia editar AL MENOS una seccion. Ahora hay un boton por seccion con su propio formatter.
 
         onChangeDateSeguridadHigiene: function (oEvent) {
             console.log("### TRNS-DIAG onChangeDateSeguridadHigiene (stub)",
@@ -964,9 +1132,22 @@ sap.ui.define([
             console.log("### TRNS-DIAG onChangeTimeSeguridadHigiene (stub)",
                         oEvent.getSource().getSelectedKey());
         },
-        onSelectReprobate: function (oEvent) {
-            console.log("### TRNS-DIAG onSelectReprobate (stub)");
+        // INI MOD TRNS #XXXXXX - mantener excluyentes los dos radios de Aprobado (Seguridad e Higiene).
+        // Cada uno esta bindeado a una propiedad distinta del modelo, asi que hay que apagar
+        // la otra a mano; si no, el estado del modelo queda inconsistente con lo que se ve.
+        onSelectApprobate: function (oEvent) {
+            if (!oEvent.getSource().getSelected()) { return; }
+            var oModel = this.getView().getModel("HabilitacionModel");
+            oModel.setProperty("/aprobadoCheck", true);
+            oModel.setProperty("/reprobadoCheck", false);
         },
+        onSelectReprobate: function (oEvent) {
+            if (!oEvent.getSource().getSelected()) { return; }
+            var oModelRep = this.getView().getModel("HabilitacionModel");
+            oModelRep.setProperty("/aprobadoCheck", false);
+            oModelRep.setProperty("/reprobadoCheck", true);
+        },
+        // FIN MOD TRNS #XXXXXX
         onChangeDateGerRegional: function (oEvent) {
             console.log("### TRNS-DIAG onChangeDateGerRegional (stub)",
                         oEvent.getSource().getSelectedKey());
@@ -976,6 +1157,262 @@ sap.ui.define([
                         oEvent.getSource().getSelectedKey());
         },
         // FIN MOD TRNS #XXXXXX
+
+        // INI MOD TRNS #PT-18 - guardado por seccion
+        // Cada seccion resuelve el literal del grupo de IAS del usuario (con sufijo de region cuando
+        // corresponde). Ese string es el que va al campo ROL de la intervencion.
+        _rolDeSeccion: function (sSeccion) {
+            var vRoles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
+            var vUO = this.getView().getModel("Habilitacion").getData().Area;
+            switch (sSeccion) {
+            case "MED_LABORAL":
+                return this._resolverRolGlobal(vRoles,
+                    ["hab_pt15_med-laboral", "MedicinaLaboral_PT15", "Medicina_Laboral"]);
+            case "REP_DIRECCION":
+                return this._resolverRolGlobal(vRoles,
+                    ["hab_pt15_rep-direccion", "Rep_Direccion_PT15"]);
+            case "SEG_HIG":
+                return this._resolverRolRegional(vRoles, "hab_pt15_seg-hig", vUO,
+                    ["seguridadH_PT15"]);
+            case "GER_REG":
+                return this._resolverRolRegional(vRoles, "hab_pt15_ger-reg-jefe-cot", vUO,
+                    ["Ger_Reg_Jefe_COT", "PT15_GerRegional"]);
+            case "GEST_CALIDAD":
+                return this._resolverRolRegional(vRoles, "hab_pt15_gest-calidad", vUO,
+                    ["Gestion_Calidad_PT152", "Gestion_Calidad_PT15"]);
+            default:
+                return null;
+            }
+        },
+
+        // UPDATE_ENTITY del backend lanza not_implemented: TODO guardado de intervencion va por create().
+        // El backend pisa Usuario con sy-uname y genera un Idadjuntos por cada create (aca se ignora:
+        // estos handlers no suben archivos). La unicidad de la fila la dan Fechaint + Horaint.
+        _crearIntervencion: function (sRol, sDatosadicionales, fnOk, fnError) {
+            var oHab = this.getView().getModel("Habilitacion").getData();
+            var oDatos = this.getView().getModel("HabilitacionModel").getData();
+            var oUserData = this.getView().getModel("UserData");
+            var oUser = oUserData ? oUserData.getData() : {};
+            var oAhora = new Date();
+            var oPayload = {
+                "Idhabilitacion": oHab.Idhabilitacion,
+                "Clasehab": "H0003",
+                "Legajo": oHab.Interno ? oHab.Legajo : oHab.Documento,
+                "Fechacreacion": oDatos.Fechacreacion || oAhora,
+                "Rol": sRol,
+                "Fechaint": oAhora,
+                "Horaint": "PT" + oAhora.getHours() + "H" + oAhora.getMinutes() + "M" + oAhora.getSeconds() + "S",
+                "Datosadicionales": sDatosadicionales || "",
+                "Firma": (oUser && oUser.Firma) || "",
+                "Nombre": (oUser && oUser.UserName) || "",
+                "Empresa": oHab.Empresa,
+                "Accion": "",
+                "Usuario": ""
+            };
+            IntervencionesServices.SaveIntervencionPT15(oPayload, fnOk, fnError);
+        },
+
+        // Valida que el usuario tenga rol para la seccion y prende el busy. Devuelve el literal del rol o null.
+        _iniciarGuardado: function (sSeccion, sNombreSeccion) {
+            var sRol = this._rolDeSeccion(sSeccion);
+            if (!sRol) {
+                MessageBox.error("No tiene un rol habilitado para guardar " + sNombreSeccion + ".");
+                return null;
+            }
+            this.getView().getModel("HabilitacionModel").setProperty("/Busy", true);
+            return sRol;
+        },
+
+        _onGuardarOk: function () {
+            sap.m.MessageToast.show("Los cambios se han guardado correctamente");
+            this.LoadIntervenciones(this.getView().getModel("Habilitacion").getData().Idhabilitacion);
+        },
+
+        _onGuardarError: function (sNombreSeccion, oError) {
+            this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
+            MessageBox.error("No se pudieron guardar los cambios de " + sNombreSeccion + ". Intente nuevamente.");
+        },
+
+        // Campos de la habilitacion que se reenvian tal cual en los create() sobre HabTecnicas2Set
+        // (el guardado de la habilitacion es un create con deep insert de la nav entity que toque).
+        _datosHabilitacionBase: function (sEstado) {
+            var habilitacion = this.getView().getModel("Habilitacion").getData();
+            return {
+                Apellido: habilitacion.Apellido,
+                Area: habilitacion.Area,
+                Base: habilitacion.Base,
+                Clasehab: habilitacion.Clasehab,
+                Documento: habilitacion.Documento,
+                Empresa: habilitacion.Empresa,
+                Empresaext: habilitacion.Empresaext,
+                Estado: sEstado,
+                Idhabilitacion: habilitacion.Idhabilitacion,
+                Interno: habilitacion.Interno,
+                Legajo: habilitacion.Legajo,
+                Lote: habilitacion.Lote,
+                Mto13: habilitacion.Mto13,
+                Mto33: habilitacion.Mto33,
+                Mto66: habilitacion.Mto66,
+                Mto132: habilitacion.Mto132,
+                Mto220: habilitacion.Mto220,
+                Mto500: habilitacion.Mto500,
+                Nombre: habilitacion.Nombre,
+                Puesto: habilitacion.Puesto,
+                Tipodoc: habilitacion.Tipodoc,
+                Tipohab: habilitacion.Tipohab,
+                Vigencia: habilitacion.Vigencia
+            };
+        },
+
+        // --- Medicina Laboral: Grado de aptitud + Fecha de vencimiento del apto medico ---
+        // UNICA seccion que toca el recalculo de estado, Hab_apmedico_nav y MotivoCambioEstado.
+        // Datosadicionales va vacio a proposito: el dato vive en Hab_apmedico_nav y duplicarlo en el
+        // JSON bifurcaria el dato respecto del print de PT15 y del resto de la app.
+        onGuardarMedLaboral: function () {
+            var oModel = this.getView().getModel("HabilitacionModel");
+            var habilitacion = this.getView().getModel("Habilitacion").getData();
+            var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
+            var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
+            // FUERA DE ALCANCE PT-18: este find busca Direccion_TecnicaMTO en un controller PT15,
+            // con lo que Rol queda undefined para un usuario de Medicina Laboral. Se deja como esta.
+            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "Direccion_TecnicaMTO");
+            var estadoNuevo = habilitacion.Estado;
+            if (oModel.oData.Gradoap === "A" || oModel.oData.Gradoap === "B" || oModel.oData.Gradoap === "C") {
+                if (habilitacion.Estado !== 'S' && habilitacion.Estado !== 'D') {
+                    estadoNuevo = 'H';
+                }
+            } else if (oModel.oData.Gradoap === "D" || oModel.oData.Gradoap === "F" || oModel.oData.Gradoap === "SEM") {
+                if (habilitacion.Estado !== 'D') {
+                    estadoNuevo = 'S';
+                }
+            } else if (oModel.oData.Gradoap === "E") {
+                estadoNuevo = 'D';
+            }
+            // valido fecha
+            // FUERA DE ALCANCE PT-18: Medicina_Fecha_vencimiento_old solo se setea cuando NO hay
+            // intervencion de Medicina Laboral, asi que en el caso normal esta comparacion no valida nada.
+            if (oModel.oData.Gradoap === "A" || oModel.oData.Gradoap === "B" || oModel.oData.Gradoap === "C") {
+                if (oModel.oData.Medicina_Fecha_vencimiento < oModel.oData.Medicina_Fecha_vencimiento_old) {
+                    MessageBox.alert("La fecha de validez debe ser mayor o igual a la actual.", {
+                        title: "Error"
+                    });
+                    return;
+                } else {
+                    habilitacion.Vigencia = oModel.oData.Medicina_Fecha_vencimiento;
+                }
+            }
+            var sRol = this._iniciarGuardado("MED_LABORAL", "Medicina Laboral");
+            if (!sRol) { return; }
+            var data = this._datosHabilitacionBase(estadoNuevo);
+            data.Hab_apmedico_nav = [{
+                "Legajo": habilitacion.Legajo,
+                "Vigencia": oModel.oData.Medicina_Fecha_vencimiento,
+                "Observaciones": "Sin observaciones",
+                "Gradoap": oModel.oData.Gradoap
+            }];
+            //Motivo cambio de estado
+            var MotivoCambioData = {
+                Clasehab: habilitacion.Clasehab,
+                Comentarios: "Cambio de estado automático por medicina laboral",
+                Empresa: Empresa,
+                Idhabilitacion: habilitacion.Idhabilitacion,
+                Rol: Rol,
+                Estado: estadoNuevo
+            };
+            this._crearIntervencion(sRol, "", function () {
+                //Guardo el nuevo estado en la habilitacion
+                HabilitacionServices.saveHabilitacion(data,
+                    jQuery.proxy(this.onSuccessCallbackStatus, this),
+                    jQuery.proxy(this.onErrorCallbackStatus, this)
+                );
+                //Guardo motivo de cambio de estado
+                MotivoCambioEstadoService.saveMotivo(MotivoCambioData,
+                    jQuery.proxy(this.onSuccessCallbackMotivoMedLaboral, this),
+                    jQuery.proxy(this.onErrorCallbackMotivo, this)
+                );
+            }.bind(this), jQuery.proxy(this._onGuardarError, this, "Medicina Laboral"));
+        },
+
+        // Igual que onSuccessCallbackMotivo pero recargando el detalle, para que la intervencion
+        // recien creada se vea sin salir y volver a entrar.
+        onSuccessCallbackMotivoMedLaboral: function () {
+            sap.m.MessageToast.show("Los cambios se han guardado correctamente");
+            this.LoadIntervenciones(this.getView().getModel("Habilitacion").getData().Idhabilitacion);
+        },
+
+        // --- Seguridad e Higiene: todos los campos de su gestion ---
+        // Dos escrituras: la intervencion (Fecha_Venc, Cantidad_Venc, Tiempo_Venc, Observacion en el
+        // JSON de Datosadicionales) y Hab_SeguridadHigiene_nav (Aprobado, Contador, Vigencia), que es
+        // donde esos tres campos viven hoy y de donde los lee el resto de la app.
+        onGuardarSegHig: function () {
+            var oDatos = this.getView().getModel("HabilitacionModel").getData();
+            var habilitacion = this.getView().getModel("Habilitacion").getData();
+            var sRol = this._iniciarGuardado("SEG_HIG", "Seguridad e Higiene");
+            if (!sRol) { return; }
+            var sDatosadicionales = JSON.stringify({
+                "SeguridadHigiene_Fecha_Venc": oDatos.SeguridadHigiene_Fecha_Venc,
+                "SeguridadHigiene_Cantidad_Venc": String(oDatos.SeguridadHigiene_Cantidad_Venc === undefined ? "" : oDatos.SeguridadHigiene_Cantidad_Venc),
+                "SeguridadHigiene_Tiempo_Venc": oDatos.SeguridadHigiene_Tiempo_Venc || "",
+                "SeguridadHigiene_Observacion": oDatos.SeguridadHigiene_Observacion || "",
+                // TP-64: persistir también el término elegido, para no depender de "adivinarlo"
+                // comparando fechas al releer (ver onBindingIntervenciones)
+                "SeguridadHigiene_Anio_Venc": oDatos.SeguridadHigiene_Anio_Venc
+            });
+            var data = this._datosHabilitacionBase(habilitacion.Estado);
+            data.Hab_SeguridadHigiene_nav = [{
+                "Legajo": habilitacion.Legajo,
+                "Vigencia": oDatos.SeguridadHigiene_Fecha_examen,
+                "Contador": oDatos.CountEvaluation,
+                "Aprobado": oDatos.aprobadoCheck
+            }];
+            this._crearIntervencion(sRol, sDatosadicionales, function () {
+                HabilitacionServices.saveHabilitacion(data,
+                    jQuery.proxy(this._onGuardarOk, this),
+                    jQuery.proxy(this._onGuardarError, this, "Seguridad e Higiene")
+                );
+            }.bind(this), jQuery.proxy(this._onGuardarError, this, "Seguridad e Higiene"));
+        },
+
+        // --- Gerencia Regional: Licencia habilitante por el termino + Observaciones ---
+        onGuardarGerReg: function () {
+            var oDatos = this.getView().getModel("HabilitacionModel").getData();
+            var sRol = this._iniciarGuardado("GER_REG", "Gerencia Regional");
+            if (!sRol) { return; }
+            var sDatosadicionales = JSON.stringify({
+                "Gerente_Reg_Fecha_Venc": oDatos.Gerente_Reg_Fecha_Venc,
+                "Gerente_Reg_Observacion": oDatos.Gerente_Reg_Observacion || ""
+            });
+            this._crearIntervencion(sRol, sDatosadicionales,
+                jQuery.proxy(this._onGuardarOk, this),
+                jQuery.proxy(this._onGuardarError, this, "Gerencia Regional")
+            );
+        },
+
+        // --- Gestion de Calidad: Observaciones ---
+        // Datosadicionales va como texto plano (no JSON): asi lo escribe el flujo actual y asi lo lee
+        // onBindingIntervenciones (ObservacionGestionCalidad = Datosadicionales, sin parsear).
+        onGuardarGestCalidad: function () {
+            var oDatos = this.getView().getModel("HabilitacionModel").getData();
+            var sRol = this._iniciarGuardado("GEST_CALIDAD", "Gestión de Calidad");
+            if (!sRol) { return; }
+            this._crearIntervencion(sRol, oDatos.ObservacionGestionCalidad || "",
+                jQuery.proxy(this._onGuardarOk, this),
+                jQuery.proxy(this._onGuardarError, this, "Gestión de Calidad")
+            );
+        },
+
+        // --- Verif. Jefatura Gestion de Calidad: Observaciones ---
+        // Idem: texto plano, como lo lee onBindingIntervenciones (Rep_Direccion_Observacion).
+        onGuardarRepDireccion: function () {
+            var oDatos = this.getView().getModel("HabilitacionModel").getData();
+            var sRol = this._iniciarGuardado("REP_DIRECCION", "Verif. Jefatura Gestión de Calidad");
+            if (!sRol) { return; }
+            this._crearIntervencion(sRol, oDatos.Rep_Direccion_Observacion || "",
+                jQuery.proxy(this._onGuardarOk, this),
+                jQuery.proxy(this._onGuardarError, this, "Verif. Jefatura Gestión de Calidad")
+            );
+        },
+        // FIN MOD TRNS #PT-18
 
         // DEPRECADA TRNS #XXXXXX - reemplazada por formatters por seccion
         onEnableRol2: function (rol) {
@@ -1007,88 +1444,10 @@ sap.ui.define([
                 }
             }
         },
-        onUpdateData: function (event) {
-            // ISSUE 229 - Medicina Laboral, Botones "Editar Datos" y "Cambio de Estado"
-            var oModel = this.getView().getModel("HabilitacionModel");
-            var habilitacion = this.getView().getModel("Habilitacion").getData();
-            var Empresa = habilitacion.Empresa === "TRANSENER" ? "100" : "300";
-            var Roles = this.getView().getModel("UserJsonModelVISTA").getData().User[0].roles;
-            var Rol = Roles.find(element => element === "Director_Tecnico" || element === "Direccion_TecnicaMTO");
-            var estadoNuevo = habilitacion.Estado;
-            if (oModel.oData.Gradoap === "A" || oModel.oData.Gradoap === "B" || oModel.oData.Gradoap === "C") {
-                if (habilitacion.Estado !== 'S' && habilitacion.Estado !== 'D') {
-                    estadoNuevo = 'H';
-                }
-            } else if (oModel.oData.Gradoap === "D" || oModel.oData.Gradoap === "F" || oModel.oData.Gradoap === "SEM") {
-                if (habilitacion.Estado !== 'D') {
-                    estadoNuevo = 'S';
-                }
-            } else if (oModel.oData.Gradoap === "E") {
-                estadoNuevo = 'D';
-            }
-            // valido fecha
-            if (oModel.oData.Gradoap === "A" || oModel.oData.Gradoap === "B" || oModel.oData.Gradoap === "C") {
-                if (oModel.oData.Medicina_Fecha_vencimiento < oModel.oData.Medicina_Fecha_vencimiento_old) {
-                    MessageBox.alert("La fecha de validez debe ser mayor o igual a la actual.", {
-                        title: "Error"
-                    });
-                    return;
-                } else {
-                    habilitacion.Vigencia = oModel.oData.Medicina_Fecha_vencimiento;
-                }
-            }
-            var data = {
-                Apellido: habilitacion.Apellido,
-                Area: habilitacion.Area,
-                Base: habilitacion.Base,
-                Clasehab: habilitacion.Clasehab,
-                Documento: habilitacion.Documento,
-                Empresa: habilitacion.Empresa,
-                Empresaext: habilitacion.Empresaext,
-                Estado: estadoNuevo,
-                Idhabilitacion: habilitacion.Idhabilitacion,
-                Interno: habilitacion.Interno,
-                Legajo: habilitacion.Legajo,
-                Lote: habilitacion.Lote,
-                Mto13: habilitacion.Mto13,
-                Mto33: habilitacion.Mto33,
-                Mto66: habilitacion.Mto66,
-                Mto132: habilitacion.Mto132,
-                Mto220: habilitacion.Mto220,
-                Mto500: habilitacion.Mto500,
-                Nombre: habilitacion.Nombre,
-                Puesto: habilitacion.Puesto,
-                Tipodoc: habilitacion.Tipodoc,
-                Tipohab: habilitacion.Tipohab,
-                Vigencia: habilitacion.Vigencia,
-                Hab_apmedico_nav: [{
-                    "Legajo": habilitacion.Legajo,
-                    "Vigencia": oModel.oData.Medicina_Fecha_vencimiento,
-                    "Observaciones": "Sin observaciones",
-                    "Gradoap": oModel.oData.Gradoap
-                }]
-            };
-            //Motivo cambio de estado
-            var MotivoCambioData = {
-                Clasehab: habilitacion.Clasehab,
-                Comentarios: "Cambio de estado automático por medicina laboral",
-                Empresa: Empresa,
-                Idhabilitacion: habilitacion.Idhabilitacion,
-                Rol: Rol,
-                Estado: estadoNuevo
-            };
-            oModel.setProperty("/Busy", true);
-            //Guardo el nuevo estado en la habilitacion
-            HabilitacionServices.saveHabilitacion(data,
-                jQuery.proxy(this.onSuccessCallbackStatus, this),
-                jQuery.proxy(this.onErrorCallbackStatus, this)
-            );
-            //Guardo motivo de cambio de estado
-            MotivoCambioEstadoService.saveMotivo(MotivoCambioData,
-                jQuery.proxy(this.onSuccessCallbackMotivo, this),
-                jQuery.proxy(this.onErrorCallbackMotivo, this)
-            );
-        },
+        // ELIMINADA TRNS #PT-18 - onUpdateData era el handler del boton unico: recalculaba el estado
+        // desde Gradoap y guardaba habilitacion + MotivoCambioEstado para CUALQUIER rol que editara.
+        // Su cuerpo vive ahora en onGuardarMedLaboral, que ademas crea la intervencion. El resto de
+        // las secciones NO toca ni el estado ni AptoMedico.
         successIntCallback: function (data) {
             var HabilitacionModel = this.getView().getModel("HabilitacionModel").getData();
             var gradoAp = {
