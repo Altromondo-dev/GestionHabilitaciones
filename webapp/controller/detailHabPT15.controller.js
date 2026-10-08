@@ -441,6 +441,14 @@ sap.ui.define([
                     if (oSegHig) {
                         oDataModel.SeguridadHigiene_Fecha_examen = FormatHelper.formatJsonDate(oSegHig.Vigencia);
                     }
+                    // INI MOD TRNS #PT16 - ************************************************************
+                    // OJO: los calculos de respaldo del termino (abajo) usaban oDataModel.SeguridadHigiene_Fecha,
+                    // que solo se asigna si la intervencion trae Firma (punto (c) de arriba). Con una
+                    // intervencion sin firma quedaba undefined y .getFullYear()/.getTime() cortaban la carga
+                    // del detalle (T000000073). Se calcula con el Fechaint de la propia intervencion, que es
+                    // el mismo valor que SeguridadHigiene_Fecha cuando hay firma.
+                    var oFechaBaseSegHig = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
+                    // FIN MOD TRNS #PT16 - ************************************************************
                     if (bAprobado) {
                         if (Intervenciones[row].Datosadicionales != "") { //Pongo esto porque estan explotando licencias...
                             var extraData = JSON.parse(Intervenciones[row].Datosadicionales);
@@ -461,16 +469,28 @@ sap.ui.define([
                             // }
                             if (extraData.SeguridadHigiene_Anio_Venc !== undefined) {
                                 oDataModel.SeguridadHigiene_Anio_Venc = extraData.SeguridadHigiene_Anio_Venc;
-                            } else {
-                                oDataModel.SeguridadHigiene_Anio_Venc = String(oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha
+                            // INI MOD TRNS #PT16 - ********** OJO: base = Fechaint (ver oFechaBaseSegHig) **********
+                            // } else {
+                            //     oDataModel.SeguridadHigiene_Anio_Venc = String(oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha
+                            //         .getFullYear());
+                            //     //Agrego esto porque no trae bien el termino cuando selecciona mes o dias
+                            //     if (oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() !== oDataModel.SeguridadHigiene_Fecha.getMonth() || oDataModel.SeguridadHigiene_Fecha_Venc
+                            //         .getDate() !== oDataModel.SeguridadHigiene_Fecha.getDate()) {
+                            //         //Difiere el mes o el día? entonces no seleccionó año, seleccionó "Otros"
+                            //         oDataModel.SeguridadHigiene_Anio_Venc = "0";
+                            //     }
+                            // }
+                            } else if (oFechaBaseSegHig) {
+                                oDataModel.SeguridadHigiene_Anio_Venc = String(oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oFechaBaseSegHig
                                     .getFullYear());
                                 //Agrego esto porque no trae bien el termino cuando selecciona mes o dias
-                                if (oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() !== oDataModel.SeguridadHigiene_Fecha.getMonth() || oDataModel.SeguridadHigiene_Fecha_Venc
-                                    .getDate() !== oDataModel.SeguridadHigiene_Fecha.getDate()) {
+                                if (oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() !== oFechaBaseSegHig.getMonth() || oDataModel.SeguridadHigiene_Fecha_Venc
+                                    .getDate() !== oFechaBaseSegHig.getDate()) {
                                     //Difiere el mes o el día? entonces no seleccionó año, seleccionó "Otros"
                                     oDataModel.SeguridadHigiene_Anio_Venc = "0";
                                 }
                             }
+                            // FIN MOD TRNS #PT16 - ****************************************************************
                             // FIN MOD TRNS #TP-64
                         }
                         if (oDataModel.SeguridadHigiene_Anio_Venc === "0") {
@@ -481,15 +501,22 @@ sap.ui.define([
                             if (typeof extraData !== "undefined" && extraData.SeguridadHigiene_Cantidad_Venc !== undefined && extraData.SeguridadHigiene_Tiempo_Venc) {
                                 oDataModel.SeguridadHigiene_Cantidad_Venc = extraData.SeguridadHigiene_Cantidad_Venc;
                                 oDataModel.SeguridadHigiene_Tiempo_Venc = extraData.SeguridadHigiene_Tiempo_Venc;
-                            } else {
+                            // INI MOD TRNS #PT16 - ********** OJO: base = Fechaint (ver oFechaBaseSegHig) **********
+                            // } else {
+                            } else if (oFechaBaseSegHig) {
                                 // Fallback para intervenciones guardadas antes de este fix
-                                var Diferencia = oDataModel.SeguridadHigiene_Fecha_Venc.getTime() - oDataModel.SeguridadHigiene_Fecha.getTime();
+                                // var Diferencia = oDataModel.SeguridadHigiene_Fecha_Venc.getTime() - oDataModel.SeguridadHigiene_Fecha.getTime();
+                                var Diferencia = oDataModel.SeguridadHigiene_Fecha_Venc.getTime() - oFechaBaseSegHig.getTime();
                                 Diferencia = Math.abs(Diferencia);
                                 var Dias = Math.floor(Diferencia / (1000 * 60 * 60 * 24));
                                 //Si coincide el día, va el mes
-                                if (oDataModel.SeguridadHigiene_Fecha_Venc.getDate() === oDataModel.SeguridadHigiene_Fecha.getDate()) {
-                                    var oTime = oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() - oDataModel.SeguridadHigiene_Fecha.getMonth();
-                                    var anios = oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha.getFullYear();
+                                // if (oDataModel.SeguridadHigiene_Fecha_Venc.getDate() === oDataModel.SeguridadHigiene_Fecha.getDate()) {
+                                //     var oTime = oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() - oDataModel.SeguridadHigiene_Fecha.getMonth();
+                                //     var anios = oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oDataModel.SeguridadHigiene_Fecha.getFullYear();
+                                if (oDataModel.SeguridadHigiene_Fecha_Venc.getDate() === oFechaBaseSegHig.getDate()) {
+                                    var oTime = oDataModel.SeguridadHigiene_Fecha_Venc.getMonth() - oFechaBaseSegHig.getMonth();
+                                    var anios = oDataModel.SeguridadHigiene_Fecha_Venc.getFullYear() - oFechaBaseSegHig.getFullYear();
+                                // FIN MOD TRNS #PT16 - ****************************************************************
                                     oDataModel.SeguridadHigiene_Tiempo_Venc = "Mes";
                                     oDataModel.SeguridadHigiene_Cantidad_Venc = oTime + anios * 12;
                                 } else {
@@ -816,11 +843,9 @@ sap.ui.define([
             return checkInt;
         },
         validaAjuntos: function (adjuntos) {
-            if (adjuntos.results.length > 0) {
-                return true;
-            } else {
-                return false;
-            }
+            // Una intervención sin archivos puede devolver AdjuntosSet = null.
+            // El formatter se ejecuta al refrescar el modelo, antes de cerrar el busy.
+            return !!(adjuntos && Array.isArray(adjuntos.results) && adjuntos.results.length > 0);
         },
         LoadRegionesModel: function () {
             var Empresa = this.getView().getModel("Habilitacion").getData().Empresa === "TRANSENER" ? "100" : "300";
