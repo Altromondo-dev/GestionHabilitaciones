@@ -358,10 +358,18 @@ sap.ui.define([
                 var roles = Intervenciones[row].Rol;
                 if (roles.includes("SOLICITANTE_PT15")) {
                     oDataModel.Solicitador_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Solicitador_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Solicitador_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Solicitador_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                 } else if (roles.includes("Habilitado_PT15")) {
                     oDataModel.Habilitado_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Habilitado_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Habilitado_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Habilitado_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                 // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
@@ -369,6 +377,10 @@ sap.ui.define([
                 } else if (roles.includes("COT_COTDT_PT15") || roles.includes("hab_pt15_cot")) {
                 // FIN MOD TRNS #XXXXXX
                     oDataModel.Capacitador_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Capacitador_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Capacitador_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Capacitador_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                 // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
@@ -429,6 +441,10 @@ sap.ui.define([
                     //     }
                     if (Intervenciones[row].Firma) {
                         oDataModel.SeguridadHigiene_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                        // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                        // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                        oDataModel.SeguridadHigiene_Usuario = Intervenciones[row].Usuario || "";
+                        // FIN MOD TRNS PT-98
                         oDataModel.SeguridadHigiene_Nombre = Intervenciones[row].Nombre;
                         oDataModel.SeguridadHigiene_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     }
@@ -532,19 +548,35 @@ sap.ui.define([
                     oDataModel.Examinador1_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Examinador1_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Examinador1_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Examinador1_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                 } else if (roles.includes("Examinador2")) {
                     oDataModel.Examinador2_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Examinador2_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Examinador2_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Examinador2_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                 } else if (roles.includes("Examinador3")) {
                     oDataModel.Examinador3_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Examinador3_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Examinador3_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Examinador3_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                 // INI MOD TRNS #XXXXXX - aceptar rol de workflow hab_pt15_* (el sufijo _NNNN lo cubre includes)
                 // } else if (roles.includes("Ger_Reg_Jefe_COT")) {
                 } else if (roles.includes("Ger_Reg_Jefe_COT") || roles.includes("hab_pt15_ger-reg-jefe-cot")) {
                 // FIN MOD TRNS #XXXXXX
                     oDataModel.Gerente_Reg_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Gerente_Reg_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Gerente_Reg_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Gerente_Reg_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     // INI MOD TRNS #XXXXXX - blindar parse: este branch pasa a ejecutarse en vivo tras Edit D
@@ -584,6 +616,10 @@ sap.ui.define([
                     }
                 } else if (roles.includes("Ger_Operaciones")) {
                     oDataModel.Ger_Operaciones_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Ger_Operaciones_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Ger_Operaciones_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Ger_Operaciones_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Ger_Operaciones_Fecha_Venc = new Date(JSON.parse(Intervenciones[row].Datosadicionales));
@@ -621,6 +657,10 @@ sap.ui.define([
                 // FIN MOD TRNS #XXXXXX
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Gestion_Calidad_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Gestion_Calidad_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Gestion_Calidad_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Gestion_Calidad_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Gestion_Calidad_Fecha_Habilitacion = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
@@ -630,6 +670,10 @@ sap.ui.define([
                 } else if (roles.includes("Rep_Direccion_PT15") || roles.includes("hab_pt15_rep-direccion")) {
                 // FIN MOD TRNS #XXXXXX
                     oDataModel.Rep_Direccion_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Rep_Direccion_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Rep_Direccion_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Rep_Direccion_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     oDataModel.Rep_Direccion_Observacion = Intervenciones[row].Datosadicionales;
@@ -639,6 +683,10 @@ sap.ui.define([
                 // FIN MOD TRNS #XXXXXX
                     //var Habilitacion = this.getView().getModel("Habilitacion").getData();
                     oDataModel.Direccion_Tecnica_Firma = "data:image/png;base64," + Intervenciones[row].Firma;
+                    // INI MOD TRNS PT-98 - la firma se muestra como el usuario corto de SAP (ej. AZCOIFER),
+                    // que el backend graba en Usuario con sy-uname al registrar la intervencion.
+                    oDataModel.Direccion_Tecnica_Usuario = Intervenciones[row].Usuario || "";
+                    // FIN MOD TRNS PT-98
                     oDataModel.Direccion_Tecnica_Nombre = Intervenciones[row].Nombre;
                     oDataModel.Direccion_Tecnica_Fecha_Vigencia = FormatHelper.formatJsonDate(Habilitacion.Vigencia);
                     oDataModel.Direccion_Tecnica_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
@@ -775,6 +823,9 @@ sap.ui.define([
             oDataModel.Medicina_Fecha_vencimiento_old = oDataModel.Medicina_Fecha_vencimiento;
             oDataModel.Medicina_Nombre = "";
             oDataModel.Medicina_Firma = "";
+            // INI MOD TRNS PT-98 - el usuario corto del apto es la key de FirmasUsuariosSet
+            oDataModel.Medicina_Usuario = "";
+            // FIN MOD TRNS PT-98
             oDataModel.Medicina_Fecha = null;
             var sUsuario = oApto && oApto.Usuario ? oApto.Usuario : "";
             this._sUsuarioFirmaApto = sUsuario;
@@ -782,6 +833,9 @@ sap.ui.define([
                 return;
             }
             oDataModel.Medicina_Fecha = oApto.Fecha ? FormatHelper.formatJsonDate(oApto.Fecha) : null;
+            // INI MOD TRNS PT-98
+            oDataModel.Medicina_Usuario = sUsuario;
+            // FIN MOD TRNS PT-98
             FirmasUsuariosServices.loadSignatureByUser(sUsuario, function (data) {
                 if (that._sUsuarioFirmaApto !== sUsuario) {
                     return;
