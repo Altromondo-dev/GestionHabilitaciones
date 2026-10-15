@@ -485,11 +485,19 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// 	]
 			// });
 			//----------------- FIN Gerencia de Planificación y Operación de la Red -----------------------------------------//
-			//----------------- Gestión de la Calidad -----------------------------------------//
+			// INI MOD TRNS #PT-60
+			// Original:
+			// //----------------- Gestión de la Calidad -----------------------------------------//
+			// _contenido.push({
+			// 	text: "\n" + "Gestión de la Calidad",
+			// 	style: 'title'
+			// });
+			//----------------- Secretaría PT15 -----------------------------------------//
 			_contenido.push({
-				text: "\n" + "Gestión de la Calidad",
+				text: "\n" + "Secretaría PT15",
 				style: 'title'
 			});
+			// FIN MOD TRNS #PT-60
 			let _gestCalidad = [];
 			if (gestCalidad.Gestion_Calidad_Firma !== "-") {
 				_gestCalidad.push({
@@ -512,11 +520,19 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 				]
 			});
 			//-----------------FIN Gestión de la Calidad -----------------------------------------//
-			//-----------------Verificación de la Jefatura de Gestión de la Calidad -----------------------------------------//
+			// INI MOD TRNS #PT-60
+			// Original:
+			// //-----------------Verificación de la Jefatura de Gestión de la Calidad -----------------------------------------//
+			// _contenido.push({
+			// 	text: "\n" + "Verificación de la Jefatura de Gestión de la Calidad",
+			// 	style: 'title'
+			// });
+			//-----------------Verificación de la Secretaría PT15 -----------------------------------------//
 			_contenido.push({
-				text: "\n" + "Verificación de la Jefatura de Gestión de la Calidad",
+				text: "\n" + "Verificación de la Secretaría PT15",
 				style: 'title'
 			});
+			// FIN MOD TRNS #PT-60
 			_contenido.push({
 				text: "\n" +
 					"Se deja constancia de la verificación del cumplimiento de los requisitos de habilitación establecidos.",
@@ -543,11 +559,19 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 					_verJefaturaGyC
 				]
 			});
-			//----------------- Conformidad de la Dirección Técnica -----------------------------------------//
+			// INI MOD TRNS #PT-60
+			// Original:
+			// //----------------- Conformidad de la Dirección Técnica -----------------------------------------//
+			// _contenido.push({
+			// 	text: "\n" + "Conformidad de la Dirección Técnica",
+			// 	style: 'title'
+			// });
+			//----------------- Conformidad de la Gerencia de Planificación y Operación de la Red (GPOR) -----------------------------------------//
 			_contenido.push({
-				text: "\n" + "Conformidad de la Dirección Técnica",
+				text: "\n" + "Conformidad de la Gerencia de Planificación y Operación de la Red (GPOR)",
 				style: 'title'
 			});
+			// FIN MOD TRNS #PT-60
 			_contenido.push({
 				text: "\n" +
 					"Habiendo considerado todos los datos precedentes y demás información relacionada, se otorga la correspondiente licencia habilitante.",
