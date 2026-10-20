@@ -538,6 +538,15 @@ sap.ui.define([
             oModel.setProperty("/IntervencionVigente", this._mapaIntervencionVigente(oAgrupado.vigentes));
             Intervenciones = oAgrupado.ultimas;
             // FIN MOD TRNS #PT-18
+            // INI MOD TRNS #PT-18 - SOLO Seguridad e Higiene. Su seccion se edita exista o no una
+            // intervencion vigente, asi que hay que separar las dos fuentes:
+            //  - lo que sale de la INTERVENCION (termino, observacion, firmante) se limpia cuando no
+            //    hay ninguna, para que no queden los valores del render anterior;
+            //  - lo que sale de la HABILITACION (Hab_SeguridadHigiene_nav) se lee SIEMPRE.
+            // El orden importa: primero la limpieza, despues la nav.
+            this._limpiarSegHigSinIntervencion(oDataModel, !!oAgrupado.vigentes.SEG_HIG);
+            this._cargarSegHigDesdeNav(oDataModel, Habilitacion);
+            // FIN MOD TRNS #PT-18
             for (var row in Intervenciones) {
                 var roles = Intervenciones[row].Rol;
                 if (roles.includes("SOLICITANTE_PT15")) {
@@ -632,25 +641,23 @@ sap.ui.define([
                         oDataModel.SeguridadHigiene_Nombre = Intervenciones[row].Nombre;
                         oDataModel.SeguridadHigiene_Fecha = FormatHelper.formatJsonDate(Intervenciones[row].Fechaint);
                     }
-                    var oSegHig = (Habilitacion.Hab_SeguridadHigiene_nav && Habilitacion.Hab_SeguridadHigiene_nav.length > 0) ?
-                        Habilitacion.Hab_SeguridadHigiene_nav[0] : null;
-                    oDataModel.CountEvaluation = oSegHig ? Number(oSegHig.Contador) || 0 : 0;
-                    // INI MOD TRNS #PT-18 - la vista no muestra Calificacion, pero el backend graba
-                    // ZTAB_SEGHIGIENE con un MODIFY de la nav tal cual llega y reemplaza la fila entera:
-                    // si no se reenvia, se pierde. Se guarda en el modelo SOLO para devolverla igual.
-                    // Calificacion es Edm.Byte: con "" Gateway falla la conversion, asi que sin valor
-                    // leido queda undefined y el guardado NO incluye la propiedad (ver onGuardarSegHig).
-                    oDataModel.SeguridadHigiene_Calificacion =
-                        (oSegHig && oSegHig.Calificacion !== undefined && oSegHig.Calificacion !== null &&
-                         oSegHig.Calificacion !== "" && !isNaN(Number(oSegHig.Calificacion))) ?
-                            Number(oSegHig.Calificacion) : undefined;
+                    // INI MOD TRNS #PT-18 - la lectura de Hab_SeguridadHigiene_nav se mudo FUERA de este
+                    // branch, a _cargarSegHigDesdeNav (se llama antes del for). Motivo: este branch solo
+                    // corre si hay una intervencion vigente de SEG_HIG, y Aprobado / Contador / Vigencia /
+                    // Calificacion viven en la HABILITACION, no en la intervencion: se deben leer igual.
+                    // Aca se reusa lo que _cargarSegHigDesdeNav ya dejo en el modelo.
+                    // // var oSegHig = (Habilitacion.Hab_SeguridadHigiene_nav && Habilitacion.Hab_SeguridadHigiene_nav.length > 0) ?
+                    // //     Habilitacion.Hab_SeguridadHigiene_nav[0] : null;
+                    // // oDataModel.CountEvaluation = oSegHig ? Number(oSegHig.Contador) || 0 : 0;
+                    // // oDataModel.SeguridadHigiene_Calificacion = ... (ver _cargarSegHigDesdeNav)
+                    // // var bAprobado = !!oSegHig && (oSegHig.Aprobado === true || oSegHig.Aprobado === "X");
+                    // // oDataModel.aprobadoCheck = bAprobado;
+                    // // oDataModel.reprobadoCheck = !!oSegHig && !bAprobado && oDataModel.CountEvaluation > 0;
+                    // // if (oSegHig) {
+                    // //     oDataModel.SeguridadHigiene_Fecha_examen = FormatHelper.formatJsonDate(oSegHig.Vigencia);
+                    // // }
+                    var bAprobado = !!oDataModel.aprobadoCheck;
                     // FIN MOD TRNS #PT-18
-                    var bAprobado = !!oSegHig && (oSegHig.Aprobado === true || oSegHig.Aprobado === "X");
-                    oDataModel.aprobadoCheck = bAprobado;
-                    oDataModel.reprobadoCheck = !!oSegHig && !bAprobado && oDataModel.CountEvaluation > 0;
-                    if (oSegHig) {
-                        oDataModel.SeguridadHigiene_Fecha_examen = FormatHelper.formatJsonDate(oSegHig.Vigencia);
-                    }
                     // INI MOD TRNS #PT16 - ************************************************************
                     // OJO: los calculos de respaldo del termino (abajo) usaban oDataModel.SeguridadHigiene_Fecha,
                     // que solo se asigna si la intervencion trae Firma (punto (c) de arriba). Con una
@@ -1085,8 +1092,64 @@ sap.ui.define([
             return oMapa;
         },
 
-        // _resolverFechacreacion solo servia para armar la PK del ALTA de una intervencion nueva. Con la
-        // sobrescritura, Fechacreacion sale TAL CUAL de la fila leida de IntervencionesPT15Set: sin uso.
+        // INI MOD TRNS #PT-18 - SOLO Seguridad e Higiene. Aprobado, Contador, Vigencia (fecha de examen)
+        // y Calificacion salen de Hab_SeguridadHigiene_nav, que es parte de la HABILITACION: se leen
+        // haya o no intervencion vigente de SEG_HIG.
+        _cargarSegHigDesdeNav: function (oDataModel, Habilitacion) {
+            var oSegHig = (Habilitacion && Habilitacion.Hab_SeguridadHigiene_nav &&
+                           Habilitacion.Hab_SeguridadHigiene_nav.length > 0) ?
+                Habilitacion.Hab_SeguridadHigiene_nav[0] : null;
+            oDataModel.CountEvaluation = oSegHig ? Number(oSegHig.Contador) || 0 : 0;
+            // La vista no muestra Calificacion, pero el backend graba ZTAB_SEGHIGIENE con un MODIFY de
+            // la nav tal cual llega y reemplaza la fila entera: si no se reenvia, se pierde. Se guarda
+            // en el modelo SOLO para devolverla igual. Calificacion es Edm.Byte: con "" Gateway falla la
+            // conversion, asi que sin valor numerico queda undefined y el guardado NO manda la
+            // propiedad (ver onGuardarSegHig).
+            oDataModel.SeguridadHigiene_Calificacion =
+                (oSegHig && oSegHig.Calificacion !== undefined && oSegHig.Calificacion !== null &&
+                 oSegHig.Calificacion !== "" && !isNaN(Number(oSegHig.Calificacion))) ?
+                    Number(oSegHig.Calificacion) : undefined;
+            var bAprobado = !!oSegHig && (oSegHig.Aprobado === true || oSegHig.Aprobado === "X");
+            oDataModel.aprobadoCheck = bAprobado;
+            oDataModel.reprobadoCheck = !!oSegHig && !bAprobado && oDataModel.CountEvaluation > 0;
+            // Sin fila de nav no hay fecha de examen. Antes quedaba el valor que hubiera en el modelo.
+            oDataModel.SeguridadHigiene_Fecha_examen = oSegHig ?
+                FormatHelper.formatJsonDate(oSegHig.Vigencia) : null;
+        },
+
+        // SOLO Seguridad e Higiene: sin intervencion vigente de SEG_HIG, los campos que salen de la
+        // INTERVENCION no tienen de donde leerse. Antes la seccion quedaba bloqueada y no importaba;
+        // ahora es editable, asi que hay que dejarla en blanco en vez de mostrar lo que haya quedado.
+        // Aprobado / reprobado / Fecha_examen / Contador NO se tocan aca: salen de la nav
+        // (ver _cargarSegHigDesdeNav, que corre despues).
+        _limpiarSegHigSinIntervencion: function (oDataModel, bVigente) {
+            if (bVigente) { return; }
+            oDataModel.SeguridadHigiene_Anio_Venc = "";
+            oDataModel.SeguridadHigiene_Cantidad_Venc = "";
+            oDataModel.SeguridadHigiene_Tiempo_Venc = "";
+            oDataModel.SeguridadHigiene_Observacion = "";
+            oDataModel.SeguridadHigiene_Fecha_Venc = null;
+            oDataModel.SeguridadHigiene_Nombre = "";
+            oDataModel.SeguridadHigiene_Fecha = null;
+            oDataModel.SeguridadHigiene_Firma = "";
+            oDataModel.SeguridadHigiene_Usuario = "";
+        },
+        // FIN MOD TRNS #PT-18
+
+        // INI MOD TRNS #PT-18 - REACTIVADA, y SOLO para el ALTA de la primera intervencion de Seguridad
+        // e Higiene (_crearPrimeraIntervencion). En la sobrescritura sigue sin usarse: ahi Fechacreacion
+        // sale TAL CUAL de la fila leida de IntervencionesPT15Set.
+        // Fechacreacion es parte de la PK de ZTAB_APROB_HAB y la comparten todas las filas de esta
+        // habilitacion: al crear una fila nueva hay que reenviar LA MISMA, no la fecha de hoy.
+        //
+        // OJO: las filas tienen que venir de IntervencionesPT15Set, NO del modelo "Intervenciones"
+        // (IntervencionesSet). Ese set devuelve Fechacreacion a medianoche UTC (verificado en QAS:
+        // /Date(1790640000000)/); el create de IntervencionesPT15Set la convierte con sy-zonlo (UTC-3)
+        // y la grabaria con el DIA ANTERIOR, distinta de la del resto de las filas.
+        //
+        // Como todas las filas de la habilitacion comparten Fechacreacion, alcanza con la primera que
+        // la traiga: por eso ya no hace falta el sort por _claveOrdenIntervencion que tenia 0bf831e
+        // (que ademas no aplica a este set, donde Fechaint ya incluye la hora).
         // // Fechacreacion de la habilitacion: la comparten todas las filas de ZTAB_APROB_HAB de esta
         // // habilitacion. Se toma de la fila mas reciente que la traiga; si ninguna la trae, hoy.
         // _resolverFechacreacion: function (aInt) {
@@ -1100,6 +1163,12 @@ sap.ui.define([
         //     });
         //     return aConFecha[0].Fechacreacion;
         // },
+        _resolverFechacreacion: function (aFilasPT15) {
+            var oConFecha = (aFilasPT15 || []).find(function (oFila) {
+                return !!oFila.Fechacreacion;
+            });
+            return oConFecha ? oConFecha.Fechacreacion : new Date();
+        },
         // FIN MOD TRNS #PT-18
 
         // INI MOD TRNS #PT16 - seccion de Medicina a partir del apto (Hab_apmedicoPT15_nav, objeto o null).
@@ -1590,10 +1659,16 @@ sap.ui.define([
         },
         // FIN MOD TRNS #PT-18
 
-        // INI MOD TRNS #PT-18 - ademas del rol y del estado, las CUATRO secciones que editan una
-        // intervencion exigen que exista una intervencion VIGENTE de ese rol: si el rol todavia no
-        // intervino, no hay fila que sobrescribir. Medicina Laboral es la excepcion (no escribe
-        // intervencion: su dato vive en la habilitacion), asi que onEnableMedLaboral no cambia.
+        // INI MOD TRNS #PT-18 - ademas del rol y del estado, GER_REG, GEST_CALIDAD y REP_DIRECCION
+        // exigen que exista una intervencion VIGENTE de ese rol: si el rol todavia no intervino, no hay
+        // fila que sobrescribir. Dos excepciones: Medicina Laboral (no escribe intervencion: su dato
+        // vive en la habilitacion) y Seguridad e Higiene (si no hay intervencion vigente, el guardado
+        // la da de ALTA; ver onGuardarSegHig / _crearPrimeraIntervencion).
+        // Original de este bloque, cuando las cuatro exigian vigencia:
+        // // ademas del rol y del estado, las CUATRO secciones que editan una intervencion exigen que
+        // // exista una intervencion VIGENTE de ese rol: si el rol todavia no intervino, no hay fila
+        // // que sobrescribir. Medicina Laboral es la excepcion (no escribe intervencion: su dato vive
+        // // en la habilitacion), asi que onEnableMedLaboral no cambia.
         // bVigente llega como un part mas del binding: HabilitacionModel>/IntervencionVigente/<CLAVE>.
         // La "vigencia" se evalua por CLAVE de _CLASIFICACION_ROLES, no por igualdad del literal del
         // rol: una intervencion cargada por el workflow (hab_pt15_seg-hig_1234) habilita la seccion
@@ -1624,8 +1699,18 @@ sap.ui.define([
         //     return this._tieneRolRegional(vRoles, "hab_pt15_seg-hig", vUO,
         //         ["seguridadH_PT15"]);
         // },
-        onEnableSegHig: function (vRoles, vUO, vEstado, bVigente) {
-            if (!bVigente) { return false; }
+        // INI MOD TRNS #PT-18 - Seguridad e Higiene ya NO exige intervencion vigente: sin ella el
+        // guardado da de alta la intervencion. Se conservan rol, region y ESTADOS_EDITABLES_PT15.
+        // La vista sigue pasando HabilitacionModel>/IntervencionVigente/SEG_HIG como 4to part en los 13
+        // bindings de la seccion: queda SIN EFECTO (JS ignora el argumento sobrante) y se deja tal cual
+        // para no tocar la vista. El part de mas no molesta: solo fuerza una revaluacion extra.
+        // // onEnableSegHig: function (vRoles, vUO, vEstado, bVigente) {
+        // //     if (!bVigente) { return false; }
+        // //     if (!this._estadoPermiteEdicion(vEstado)) { return false; }
+        // //     return this._tieneRolRegional(vRoles, "hab_pt15_seg-hig", vUO,
+        // //         ["seguridadH_PT15"]);
+        // // },
+        onEnableSegHig: function (vRoles, vUO, vEstado) {
             if (!this._estadoPermiteEdicion(vEstado)) { return false; }
             return this._tieneRolRegional(vRoles, "hab_pt15_seg-hig", vUO,
                 ["seguridadH_PT15"]);
@@ -1776,6 +1861,52 @@ sap.ui.define([
         //     };
         //     IntervencionesServices.SaveIntervencionPT15(oPayload, fnOk, fnError);
         // },
+        // INI MOD TRNS #PT-18 - ALTA de la PRIMERA intervencion de una seccion. Hoy la usa SOLO
+        // Seguridad e Higiene: GER_REG, GEST_CALIDAD y REP_DIRECCION siguen siendo solo sobrescritura y
+        // quedan bloqueadas si el rol no intervino. Es _crearIntervencion de 0bf831e con cuatro cambios:
+        //  (1) recibe la SECCION y resuelve el literal del rol con _rolDeSeccion (ya validado no-nulo
+        //      por _iniciarGuardado);
+        //  (2) recibe la Fechaint ya calculada, para que la fila y la base del termino se graben con el
+        //      MISMO instante (ver onGuardarSegHig);
+        //  (3) Fechacreacion se resuelve releyendo IntervencionesPT15Set (el MISMO read que usa
+        //      _sobrescribirIntervencion), no desde el modelo "Intervenciones": ver _resolverFechacreacion;
+        //  (4) si ese read falla, se aborta ANTES del create, con el mismo patron que la sobrescritura.
+        // La PK (Rol + Fechaint + Horaint de ahora) no puede colisionar con una fila existente, asi que
+        // esto es siempre un alta y nunca la sobrescritura encubierta que hace el backend ante PK igual.
+        // El backend pisa Usuario con sy-uname; Firma y Nombre del payload son los que registran QUIEN
+        // firmo, y por eso van los del usuario logueado (UserData).
+        _crearPrimeraIntervencion: function (sSeccion, sDatosadicionales, oFechaInt, fnOk, fnError) {
+            var that = this;
+            var oHab = this.getView().getModel("Habilitacion").getData();
+            var oUserData = this.getView().getModel("UserData");
+            var oUser = oUserData ? oUserData.getData() : {};
+            // Mismo filtro que la lectura: Idhabilitacion + Clasehab (literal 'H0003').
+            IntervencionesServices.loadIntervencionesPT15ByHab(oHab.Idhabilitacion, "H0003", function (data) {
+                var aFilas = (data && data.results) || [];
+                var oPayload = {
+                    "Idhabilitacion": oHab.Idhabilitacion,
+                    "Clasehab": "H0003",
+                    "Legajo": oHab.Interno ? oHab.Legajo : oHab.Documento,
+                    "Fechacreacion": that._resolverFechacreacion(aFilas),
+                    "Rol": that._rolDeSeccion(sSeccion),
+                    "Fechaint": oFechaInt,
+                    "Horaint": "PT" + oFechaInt.getHours() + "H" + oFechaInt.getMinutes() + "M" + oFechaInt.getSeconds() + "S",
+                    "Datosadicionales": sDatosadicionales || "",
+                    "Firma": (oUser && oUser.Firma) || "",
+                    "Nombre": (oUser && oUser.UserName) || "",
+                    "Empresa": oHab.Empresa,
+                    "Accion": "",
+                    "Usuario": ""
+                };
+                IntervencionesServices.SaveIntervencionPT15(oPayload, fnOk, fnError);
+            }, function (oError) {
+                that._abortarAltaIntervencion(
+                    "No se pudieron leer las intervenciones para registrar la intervención. " +
+                    "No se guardó ningún cambio.",
+                    "error leyendo IntervencionesPT15Set", { seccion: sSeccion, error: oError });
+            });
+        },
+        // FIN MOD TRNS #PT-18
         _sobrescribirIntervencion: function (sSeccion, oCambios, fnOk, fnError) {
             var that = this;
             var oHab = this.getView().getModel("Habilitacion").getData();
@@ -1850,6 +1981,15 @@ sap.ui.define([
             this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
             MessageBox.error(sMensaje);
         },
+
+        // INI MOD TRNS #PT-18 - idem para el ALTA (_crearPrimeraIntervencion): corta ANTES del create,
+        // apaga el busy, deja el detalle en consola y avisa.
+        _abortarAltaIntervencion: function (sMensaje, sDetalle, oDetalle) {
+            console.error("### TRNS #PT-18 alta de intervencion - " + sDetalle, oDetalle);
+            this.getView().getModel("HabilitacionModel").setProperty("/Busy", false);
+            MessageBox.error(sMensaje);
+        },
+        // FIN MOD TRNS #PT-18
 
         // JSON (SegHig, GerReg): se parte del Datosadicionales VIGENTE de la fila de IntervencionesPT15Set
         // y se mergean SOLO las claves editadas, con los nombres exactos que lee onBindingIntervenciones.
@@ -2158,8 +2298,14 @@ sap.ui.define([
         // FIN MOD TRNS #PT-18
 
         // INI MOD TRNS #PT-18 - Seguridad e Higiene: dos escrituras.
-        //  1) su intervencion: se SOBRESCRIBE el Datosadicionales de la vigente, mergeando solo las
-        //     claves que lee la vista y conservando el resto (#TP-64 y las del workflow).
+        //  1) su intervencion. CON intervencion vigente de SEG_HIG se SOBRESCRIBE el Datosadicionales,
+        //     mergeando solo las claves que lee la vista y conservando el resto (#TP-64 y las del
+        //     workflow). SIN intervencion vigente se da de ALTA (_crearPrimeraIntervencion): no hay
+        //     JSON previo con el que mergear, asi que el Datosadicionales se arma SOLO con las claves
+        //     que lee la vista. Despues del alta, la recarga deja esa fila como vigente y los guardados
+        //     siguientes vuelven a ser sobrescritura.
+        //  // 1) su intervencion: se SOBRESCRIBE el Datosadicionales de la vigente, mergeando solo las
+        //  //    claves que lee la vista y conservando el resto (#TP-64 y las del workflow).
         //  2) Hab_SeguridadHigiene_nav (Aprobado, Contador, Vigencia), de donde lo lee el resto de la app.
         // El guardado de la habilitacion migra a Habtecnicas2PT15Set: se lee y se escribe del MISMO set.
         // // --- Seguridad e Higiene: todos los campos de su gestion ---
@@ -2171,23 +2317,33 @@ sap.ui.define([
             var habilitacion = this.getView().getModel("Habilitacion").getData();
             var sRol = this._iniciarGuardado("SEG_HIG", "Seguridad e Higiene");
             if (!sRol) { return; }
+            // ALTA o SOBRESCRITURA. Base del termino:
+            //  - con intervencion vigente, su Fechaint (la sobrescritura no la cambia, asi que al releer
+            //    la base es la misma y el termino redondea);
+            //  - sin intervencion vigente, la Fechaint de la que se esta por crear (AHORA), que es la
+            //    que despues se lee como "fecha de la intervencion original".
+            var bHayVigente = !!(this._oIntervencionesVigentes || {}).SEG_HIG;
+            var oFechaInt = bHayVigente ? null : new Date();
+            var oFechaBase = bHayVigente ? this._fechaBaseTermino("SEG_HIG") : oFechaInt;
             // Examen REPROBADO: la lectura del JSON esta condicionada a Aprobado (ver
             // onBindingIntervenciones), asi que el termino y la observacion llegan vacios al modelo.
-            // Sobrescribir la intervencion los borraria: con Aprobado en falso NO se toca el JSON y
-            // solo se guarda la habilitacion.
+            // Con intervencion vigente, sobrescribirla los borraria: NO se toca el JSON y solo se guarda
+            // la habilitacion. Sin intervencion vigente igual se da el alta, con Datosadicionales vacio,
+            // para que quede registrado QUIEN evaluo; el termino no se exige.
             var bAprobado = !!oDatos.aprobadoCheck;
             var oCambios = null;
+            var sDatosadicionalesAlta = "";
             if (bAprobado) {
                 // El vencimiento se RECALCULA desde el termino editado; antes se reenviaba el viejo
                 // porque onChangeDate/TimeSeguridadHigiene son stubs y nunca lo recomputaban.
-                var oFechaVenc = this._calcularFechaVenc(this._fechaBaseTermino("SEG_HIG"),
+                var oFechaVenc = this._calcularFechaVenc(oFechaBase,
                     oDatos.SeguridadHigiene_Anio_Venc, oDatos.SeguridadHigiene_Cantidad_Venc,
                     oDatos.SeguridadHigiene_Tiempo_Venc);
                 if (!oFechaVenc) {
                     this._abortarTerminoInvalido();
                     return;
                 }
-                oCambios = { tipo: "json", claves: {
+                var oClaves = {
                     "SeguridadHigiene_Fecha_Venc": oFechaVenc,
                     "SeguridadHigiene_Cantidad_Venc": String(oDatos.SeguridadHigiene_Cantidad_Venc === undefined ? "" : oDatos.SeguridadHigiene_Cantidad_Venc),
                     "SeguridadHigiene_Tiempo_Venc": oDatos.SeguridadHigiene_Tiempo_Venc || "",
@@ -2195,7 +2351,10 @@ sap.ui.define([
                     // TP-64: persistir también el término elegido, para no depender de "adivinarlo"
                     // comparando fechas al releer (ver onBindingIntervenciones)
                     "SeguridadHigiene_Anio_Venc": oDatos.SeguridadHigiene_Anio_Venc
-                } };
+                };
+                oCambios = { tipo: "json", claves: oClaves };
+                // En el ALTA no hay Datosadicionales previo: el JSON va SOLO con estas claves, sin merge.
+                sDatosadicionalesAlta = JSON.stringify(oClaves);
             }
             var data = this._datosHabilitacionBase(habilitacion.Estado);
             // Vigencia de cabecera en null: con valor, el backend pisa fecha_creacion con la fecha del
@@ -2225,12 +2384,19 @@ sap.ui.define([
                     jQuery.proxy(this._onGuardarError, this, "Seguridad e Higiene")
                 );
             }.bind(this);
+            var fnError = jQuery.proxy(this._onGuardarError, this, "Seguridad e Higiene");
+            // Sin intervencion vigente: ALTA primero, habilitacion despues (mismo encadenado que la
+            // sobrescritura). Si el alta falla, la habilitacion NO se guarda.
+            if (!bHayVigente) {
+                this._crearPrimeraIntervencion("SEG_HIG", sDatosadicionalesAlta, oFechaInt,
+                    fnGuardarHabilitacion, fnError);
+                return;
+            }
             if (!oCambios) {
                 fnGuardarHabilitacion();
                 return;
             }
-            this._sobrescribirIntervencion("SEG_HIG", oCambios, fnGuardarHabilitacion,
-                jQuery.proxy(this._onGuardarError, this, "Seguridad e Higiene"));
+            this._sobrescribirIntervencion("SEG_HIG", oCambios, fnGuardarHabilitacion, fnError);
         },
 
         // Gerencia Regional: JSON en Datosadicionales. Ahora se persiste tambien el TERMINO
