@@ -109,7 +109,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 				Gerente_Reg_Tiempo_Venc: oModelHab.Gerente_Reg_Tiempo_Venc ? oModelHab.Gerente_Reg_Tiempo_Venc : "-",
 				Gerente_Reg_Observacion: oModelHab.Gerente_Reg_Observacion ? oModelHab.Gerente_Reg_Observacion : "-",
 				Gerente_Reg_Nombre: oModelHab.Gerente_Reg_Nombre ? oModelHab.Gerente_Reg_Nombre : "-",
-				Gerente_Reg_Firma: FormatHelper.formatImage(oModelHab.SeguridadHigiene_Firma)
+				Gerente_Reg_Firma: FormatHelper.formatImage(oModelHab.Gerente_Reg_Firma)
 			};
 			// GPOR (Gerencia de Planificación y Operación de la Red) - comentado porque fue removido del workflow
 			// let gerPlanOperRed = {
@@ -195,7 +195,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			});
 			// -------   Entrenamiento / Experiencia previa en el trabajo ---------- //
 			_contenido.push({
-				text: "\n" + "Entrenamiento / Experiencia Previa en el Trabajo",
+				text: "\n" + Texts.getTranslation("textTitleCapEntre"),
 				style: 'title'
 			});
 			_contenido.push({
@@ -225,15 +225,18 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			});
 			// ----------- FIN Entrenamiento / Experiencia previa en el trabajo  ----------------------------------------//
 			//------------ conformidadEmpleado -------------------------------------------------------------------------//
+			// INI MOD TRNS PT-98 - este bloque es Conformidad del Empleado: llevaba por error el titulo
+			// y el subtitulo de Evaluacion del Desempeno, que se emiten mas abajo en su propio bloque.
 			_contenido.push({
-				text: "\n" + "Evaluación del Desempeño en la Operación",
+				text: "\n" + Texts.getTranslation("ConfEmpleado"),
 				style: 'title'
 			});
 			_contenido.push({
 				text: "\n" +
-					"El Centro de Control de Operaciones considera adecuado el desempeño del operador",
+					Texts.getTranslation("textConf1") + oModelGral.Empresa + " " + Texts.getTranslation("textConf2"),
 				style: 'subTitle'
 			});
+			// FIN MOD TRNS PT-98
 			let _conformidadEmpleado = [];
 			if (conformidadEmpleado.Habilitado_Firma !== "-") {
 				_conformidadEmpleado.push({
@@ -257,12 +260,12 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			//------------ FIN conformidad del Empleado ----------------------------------------------------------------//
 			// -------   Evaluación del Desempeño en la Operación ---------- //
 			_contenido.push({
-				text: "\n" + "Evaluación del Desempeño en la Operación",
+				text: "\n" + Texts.getTranslation("textTitleEvaDesemp"),
 				style: 'title'
 			});
 			_contenido.push({
 				text: "\n" +
-					"El Centro de Control de Operaciones considera adecuado el desempeño del operador",
+					Texts.getTranslation("textEvaDesemp"),
 				style: 'subTitle'
 			});
 			let _evalDesempeño = [];
@@ -290,7 +293,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			_contenido.push({
 				// INI MOD TRNS #PT16
 				// text: "\n" + "Medicina Laboral",
-				text: "\n" + "Salud Ocupacional",
+				text: "\n" + Texts.getTranslation("MedicinaLaboral"),
 				// FIN MOD TRNS #PT16
 				style: 'title'
 			});
@@ -319,7 +322,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// ----------- FIN Medicina Laboral -----------------------------------------------------------------//
 			// -------   Seguridad e Higiene ---------------------------------------------------------------------- //
 			_contenido.push({
-				text: "\n" + "Seguridad e Higiene",
+				text: "\n" + Texts.getTranslation("SeguridadHigiene"),
 				style: 'title'
 			});
 			let _segHigiene = [];
@@ -350,7 +353,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// ----------- FIN Seguridad e Higiene -----------------------------------------------------------------//
 			//------------ Evaluación y Calificación ---------------------------------------------------------------//
 			_contenido.push({
-				text: "\n" + "Evaluación y Calificación",
+				text: "\n" + Texts.getTranslation("EvaluacionCalificacion"),
 				style: 'title'
 			});
 			_contenido.push({
@@ -426,7 +429,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			//------------ FIN Evaluación y Calificación -----------------------------------------------------------//
 			//---------------- Gerencia Regional / Jefatura COT - COTDT ---------------------------------------------//
 			_contenido.push({
-				text: "\n" + "Gerencia Regional / Jefatura COT - COTDT",
+				text: "\n" + Texts.getTranslation("GerenciaRegional"),
 				style: 'title'
 			});
 			// Evaluacion y clasificacion 3
@@ -494,7 +497,7 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// });
 			//----------------- Secretaría PT15 -----------------------------------------//
 			_contenido.push({
-				text: "\n" + "Secretaría PT15",
+				text: "\n" + Texts.getTranslation("GestionCalidad"),
 				style: 'title'
 			});
 			// FIN MOD TRNS #PT-60
@@ -529,13 +532,13 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// });
 			//-----------------Verificación de la Secretaría PT15 -----------------------------------------//
 			_contenido.push({
-				text: "\n" + "Verificación de la Secretaría PT15",
+				text: "\n" + Texts.getTranslation("textTitleVerif"),
 				style: 'title'
 			});
 			// FIN MOD TRNS #PT-60
 			_contenido.push({
 				text: "\n" +
-					"Se deja constancia de la verificación del cumplimiento de los requisitos de habilitación establecidos.",
+					Texts.getTranslation("textVerif"),
 				style: 'subTitle'
 			});
 			let _verJefaturaGyC = [];
@@ -568,13 +571,13 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			// });
 			//----------------- Conformidad de la Gerencia de Planificación y Operación de la Red (GPOR) -----------------------------------------//
 			_contenido.push({
-				text: "\n" + "Conformidad de la Gerencia de Planificación y Operación de la Red (GPOR)",
+				text: "\n" + Texts.getTranslation("textTitleConform"),
 				style: 'title'
 			});
 			// FIN MOD TRNS #PT-60
 			_contenido.push({
 				text: "\n" +
-					"Habiendo considerado todos los datos precedentes y demás información relacionada, se otorga la correspondiente licencia habilitante.",
+					Texts.getTranslation("textConform"),
 				style: 'subTitle'
 			});
 			let _confDireccionTec = [];

@@ -470,4 +470,14 @@
     /* el margen propio del FileUploader hace de separacion entre los dos botones */
     margin-right: 0.5rem;
 }
+
+/* "Equipo Examinador" se alinea con el parrafo "Certificamos que el empleado..." que
+   tiene arriba: ese Label lleva sapUiSmallMarginBegin (1rem) y el Title solo .TitleBold,
+   que aporta margin-left: 5px. .TitleBold la comparten las vistas MTO y TCT, asi que no
+   se toca: se sobreescribe solo aca, con un selector mas especifico para no depender del
+   orden de las reglas. Ambos cuelgan del mismo VBox.colorGray, que no agrega padding. */
+.moduloRol .tituloEquipoExa {
+    margin-left: 1rem;
+}
+
 /* ---- FIN MOD TRNS PT-98 / EF ---- */

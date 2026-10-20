@@ -39,7 +39,8 @@
 									<VBox alignItems="Center" direction="Column" class="sapUiHideOnPhone ContentImg" fitContainer="false" width="35%" height="auto"
 										justifyContent="End" renderType="Div" visible="true" displayInline="false">
 										<items>
-											<Image class="signatureBackground" src="/img/{Habilitacion>/Empresa}.png" height="auto" width="200px" densityAware="false"/>
+											<Image class="signatureBackground" src="{path: 'Habilitacion>/Empresa', formatter: '.formatLogoSociedad'}"
+            visible="{= !!${Habilitacion>/Empresa} }" height="auto" width="200px" densityAware="false"/>
 										</items>
 										<layoutData/>
 									</VBox>
@@ -72,7 +73,7 @@
 																				<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
 																			</layoutData>
 																		</Label>
-																		<ComboBox id="licFuncion" selectedKey="{Habilitacion>/Tipohab}" editable="false" items="{Funciones>/Funciones}" width="100%">
+																		<ComboBox id="licFuncion" selectedKey="{Habilitacion>/Tipohab}" enabled="false" items="{Funciones>/Funciones}" width="100%">
 																			<items>
 																				<core:Item key="{Funciones>Tipohab}" text="{Funciones>Descripcion}"/>
 																			</items>
@@ -129,7 +130,7 @@
 																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
 																					</layoutData>
 																				</Label>
-																				<Input type="Text" value="{Habilitacion>/Legajo}" editable="false" id="inputLegajo" visible="false" width="100%">
+																				<Input type="Text" value="{Habilitacion>/Legajo}" enabled="false" id="inputLegajo" visible="false" width="100%">
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
@@ -143,7 +144,7 @@
 																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
 																					</layoutData>
 																				</Label>
-																				<Input id="licNombre" type="Text" value="{/Nombre}" editable="false" width="100%">
+																				<Input id="licNombre" type="Text" value="{/Nombre}" enabled="false" width="100%">
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
@@ -153,7 +154,7 @@
 																						<l:GridData span="XL2 L2 M2 S12"/>
 																					</layoutData>
 																				</Label>
-																				<Input id="licApellido" type="Text" value="{/Apellido}" editable="false" width="100%">
+																				<Input id="licApellido" type="Text" value="{/Apellido}" enabled="false" width="100%">
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
@@ -169,14 +170,14 @@
 																				</Label>
 																				<HBox width="100%" renderType="Bare" class="docIdentidad">
 																					<items>
-																						<ComboBox id="licDocIdent" selectedKey="{Habilitacion>/Tipodoc}" editable="false" width="32%">
+																						<ComboBox id="licDocIdent" selectedKey="{Habilitacion>/Tipodoc}" enabled="false" width="32%">
 																							<items>
 																								<core:Item text="DNI" key="1"/>
 																								<core:Item text="Pasaporte" key="2"/>
 																								<core:Item text="Otro" key="3"/>
 																							</items>
 																						</ComboBox>
-																						<Input type="Text" showValueHelp="false" value="{Habilitacion>/Documento}" editable="false" visible="true" valueHelpOnly="false" width="64%" class="sapUiTinyMarginBegin"/>
+																						<Input type="Text" showValueHelp="false" value="{Habilitacion>/Documento}" enabled="false" visible="true" valueHelpOnly="false" width="64%" class="sapUiTinyMarginBegin"/>
 																					</items>
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12"/>
@@ -187,7 +188,7 @@
 																						<l:GridData span="XL2 L2 M2 S12"/>
 																					</layoutData>
 																				</Label>
-																				<ComboBox id="licTextRegion" selectedKey="{Habilitacion>/Area}" editable="false" items="{Regiones>/Regiones}" width="100%">
+																				<ComboBox id="licTextRegion" selectedKey="{Habilitacion>/Area}" enabled="false" items="{Regiones>/Regiones}" width="100%">
 																					<items>
 																						<core:Item key="{Regiones>Codigo}" text="{Regiones>Region}"/>
 																					</items>
@@ -212,8 +213,7 @@
 												<HBox width="100%" height="2.75rem" alignItems="End" class="marginTopTitle" justifyContent="SpaceBetween">
 													<items>
 														<Title text="{i18n>textTitleCapEntre}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
-														<u:FileUploader class="fileUploader" tooltip="Adjuntar Archivo." buttonText="Adjuntar Archivo" buttonOnly="true" change="onChangeFile"
-															icon="sap-icon://attachment" enabled="false"></u:FileUploader>
+														<!-- INI MOD TRNS PT-98 - el Adjuntar Archivo por seccion se unifico en un unico boton en la barra inferior. -->
 													</items>
 												</HBox>
 												<VBox class="colorGray">
@@ -226,7 +226,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Solicitador_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Solicitador_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -236,7 +236,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" dateValue="{HabilitacionModel>/Solicitador_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
+																<DatePicker enabled="false" dateValue="{HabilitacionModel>/Solicitador_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -276,7 +276,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Habilitado_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Habilitado_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -286,7 +286,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" dateValue="{HabilitacionModel>/Habilitado_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
+																<DatePicker enabled="false" dateValue="{HabilitacionModel>/Habilitado_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -314,8 +314,7 @@
 												<HBox width="100%" height="2.75rem" alignItems="End" class="marginTopTitle" justifyContent="SpaceBetween">
 													<items>
 														<Title text="{i18n>textTitleEvaDesemp}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
-														<u:FileUploader class="fileUploader" tooltip="Adjuntar Archivo." enabled="false" buttonText="Adjuntar Archivo" buttonOnly="true"
-															icon="sap-icon://attachment"></u:FileUploader>
+														<!-- INI MOD TRNS PT-98 - el Adjuntar Archivo por seccion se unifico en un unico boton en la barra inferior. -->
 													</items>
 												</HBox>
 												<VBox class="colorGray">
@@ -328,7 +327,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Capacitador_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Capacitador_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -338,7 +337,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" dateValue="{HabilitacionModel>/Capacitador_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
+																<DatePicker enabled="false" dateValue="{HabilitacionModel>/Capacitador_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -368,10 +367,13 @@
 														<Title text="{i18n>MedicinaLaboral}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
 														<HBox alignItems="Start" class="accionesSeccion" renderType="Bare">
 															<items>
-																<!-- INI MOD TRNS #PT-18 - el enabled migro de onEnableRol3 (deprecado) a onEnableMedLaboral -->
+																<!-- INI MOD TRNS #PT-18 - el enabled migro de onEnableRol3 (deprecado) a onEnableMedLaboral.
+																     Original de 3dc9b09:
 																<u:FileUploader class="fileUploader" tooltip="Adjuntar Archivo." buttonText="Adjuntar Archivo" buttonOnly="true" change="onChangeFile"
 																	icon="sap-icon://attachment"
-																	enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}"></u:FileUploader>
+																	enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}"></u:FileUploader>
+																-->
+																<!-- INI MOD TRNS PT-98 - el Adjuntar Archivo por seccion se unifico en un unico boton en la barra inferior. -->
 																<!-- FIN MOD TRNS #PT-18 -->
 																<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
 																<Button icon="sap-icon://save" press="onGuardarMedLaboral" text="{i18n>GuardarDatos}"
@@ -403,7 +405,7 @@
 																					items="{gradoAptitud>/gradoAptitud}">
 																				-->
 																				<ComboBox id="licGradoAptitud" selectedKey="{HabilitacionModel>/Gradoap}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}"
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}"
 																					items="{gradoAptitud>/gradoAptitud}" width="100%">
 																				<!-- FIN MOD TRNS #XXXXXX -->
 																					<items>
@@ -413,13 +415,9 @@
 																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
 																				</ComboBox>
-																			</f:fields>
-																		</f:FormElement>
-																		<f:FormElement>
-																			<f:fields>
-																				<Label wrapping="true" labelFor="licFechaVtoApto" text="{i18n>FechaVencimiento}:" class="topLabel">
+																				<Label wrapping="true" width="100%" textAlign="End" labelFor="licFechaVtoApto" text="{i18n>FechaVencimiento}:" class="topLabel TextEnd">
 																					<layoutData>
-																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
+																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
 																				</Label>
 																				<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
@@ -427,9 +425,9 @@
 																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}">
 																				-->
 																				<DatePicker id="licFechaVtoApto" dateValue="{HabilitacionModel>/Medicina_Fecha_vencimiento}" displayFormat="dd/MM/yyyy" width="100%"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableMedLaboral'}">
 																					<layoutData>
-																						<l:GridData span="XL3 L3 M3 S12"/>
+																						<l:GridData span="XL2 L2 M2 S12"/>
 																					</layoutData>
 																				</DatePicker>
 																				<!-- FIN MOD TRNS #XXXXXX -->
@@ -446,7 +444,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Medicina_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Medicina_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -456,7 +454,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" dateValue="{HabilitacionModel>/Medicina_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
+																<DatePicker enabled="false" dateValue="{HabilitacionModel>/Medicina_Fecha}" displayFormat="dd/MM/yyyy" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -486,7 +484,7 @@
 														<Title text="{i18n>SeguridadHigiene}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
 														<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
 														<Button icon="sap-icon://save" press="onGuardarSegHig" text="{i18n>GuardarDatos}"
-															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"/>
+															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}"/>
 														<!-- FIN MOD TRNS #PT-18 -->
 													</items>
 												</HBox>
@@ -509,7 +507,7 @@
 																				<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																				<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/aprobadoCheck}" text="Si" editable="false">
 																				-->
-																				<RadioButton groupName="Aprobado_SegHig" selected="{HabilitacionModel>/aprobadoCheck}" select="onSelectApprobate" text="Si" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																				<RadioButton groupName="Aprobado_SegHig" selected="{HabilitacionModel>/aprobadoCheck}" select="onSelectApprobate" text="Si" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
 																				<!-- FIN MOD TRNS #XXXXXX -->
 																					<layoutData>
 																						<l:GridData span="L1 M1 S4"/>
@@ -518,12 +516,29 @@
 																				<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																				<RadioButton groupName="Aprobado" selected="{HabilitacionModel>/reprobadoCheck}" select="onSelectReprobate" text="No" editable="false">
 																				-->
-																				<RadioButton groupName="Aprobado_SegHig" selected="{HabilitacionModel>/reprobadoCheck}" select="onSelectReprobate" text="No" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																				<RadioButton groupName="Aprobado_SegHig" selected="{HabilitacionModel>/reprobadoCheck}" select="onSelectReprobate" text="No" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
 																				<!-- FIN MOD TRNS #XXXXXX -->
 																					<layoutData>
 																						<l:GridData span="L1 M1 S4"/>
 																					</layoutData>
 																				</RadioButton>
+																				<Label wrapping="true" width="100%" textAlign="End" labelFor="licFechaExamenSegHig" text="{i18n>FechaExamen}:" class="topLabel TextEnd">
+																					<layoutData>
+																						<l:GridData span="XL2 L2 M2 S12"/>
+																					</layoutData>
+																				</Label>
+																				<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
+																				<DatePicker dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha_examen}" displayFormat="dd/MM/yyyy"
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
+																				-->
+																				<DatePicker id="licFechaExamenSegHig" dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha_examen}" displayFormat="dd/MM/yyyy" width="100%"
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}"
+																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
+																					<layoutData>
+																						<l:GridData span="XL2 L2 M3 S12"/>
+																					</layoutData>
+																				</DatePicker>
+																				<!-- FIN MOD TRNS #XXXXXX -->
 																				<Label wrapping="true" width="100%" textAlign="End" text="{i18n>NVRepro}" class="topLabel TextEnd">
 																					<layoutData>
 																						<l:GridData span="XL2 L2 M2 S12"/>
@@ -542,27 +557,6 @@
 																	<f:formElements>
 																		<f:FormElement>
 																			<f:fields>
-																				<Label wrapping="true" labelFor="licFechaExamenSegHig" text="{i18n>FechaExamen}:" class="topLabel">
-																					<layoutData>
-																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
-																					</layoutData>
-																				</Label>
-																				<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
-																				<DatePicker dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha_examen}" displayFormat="dd/MM/yyyy"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
-																				-->
-																				<DatePicker id="licFechaExamenSegHig" dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha_examen}" displayFormat="dd/MM/yyyy" width="100%"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
-																					<layoutData>
-																						<l:GridData span="XL3 L3 M3 S12"/>
-																					</layoutData>
-																				</DatePicker>
-																				<!-- FIN MOD TRNS #XXXXXX -->
-																			</f:fields>
-																		</f:FormElement>
-																		<f:FormElement>
-																			<f:fields>
 																				<Label text="{i18n>FechaValida}:" class="topLabel" wrapping="true">
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
@@ -573,8 +567,8 @@
 																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
 																				-->
 																				<ComboBox class="sapUiTinyMarginTop" selectedKey="{HabilitacionModel>/SeguridadHigiene_Anio_Venc}" change="onChangeDateSeguridadHigiene" width="100%"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}"
+																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
 																					<items>
 																						<core:Item text="1 Año" key="1"/>
 																						<core:Item text="2 Años" key="2"/>
@@ -591,8 +585,8 @@
 																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
 																				-->
 																				<Input class="sapUiTinyMarginTop" type="Number" maxLength="2" value="{HabilitacionModel>/SeguridadHigiene_Cantidad_Venc}" width="100%"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}"
+																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
 																					<layoutData>
 																						<l:GridData span="XL1 L1 M1 S6"/>
 																					</layoutData>
@@ -603,8 +597,8 @@
 																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}">
 																				-->
 																				<ComboBox class="sapUiTinyMarginTop" selectedKey="{HabilitacionModel>/SeguridadHigiene_Tiempo_Venc}" change="onChangeTimeSeguridadHigiene" width="100%"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}"
+																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
 																					<items>
 																						<core:Item text="Días" key="Dia"/>
 																						<core:Item text="Meses" key="Mes"/>
@@ -632,8 +626,8 @@
 																					</layoutData>
 																				</Label>
 																				<TextArea id="licObsSegHig" rows="3" value="{HabilitacionModel>/SeguridadHigiene_Observacion}"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}"
+																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/SEG_HIG'} ], formatter: '.onEnableSegHig'}">
 																					<layoutData>
 																						<l:GridData span="XL8 L8 M8 S12"/>
 																					</layoutData>
@@ -656,26 +650,36 @@
 																<Input editable="false" type="Text" value="{HabilitacionModel>/SeguridadHigiene_Nombre}"
 																	enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Seguridad_Higiene'], formatter: '.onEnableRol2'}"/>
 																-->
+																<!-- INI MOD TRNS #PT-18 - solo lectura: muestra QUIEN intervino. La sobrescritura conserva
+																     Nombre y Firma desde la base, asi que editarlo no tenia ningun efecto.
 																<Input type="Text" value="{HabilitacionModel>/SeguridadHigiene_Nombre}" width="100%"
 																	editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
 																	enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																-->
+																<Input type="Text" value="{HabilitacionModel>/SeguridadHigiene_Nombre}" width="100%" enabled="false">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
 																</Input>
+																<!-- FIN MOD TRNS #PT-18 -->
 																<!-- FIN MOD TRNS #XXXXXX -->
 																<Text width="100%" textAlign="End" text="{i18n>Fecha}:" class="topLabel TextEnd">
 																	<layoutData>
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
+																<!-- INI MOD TRNS #PT-18 - solo lectura: muestra CUANDO intervino. La sobrescritura no cambia
+																     Fechaint, que ademas es la fecha base del termino de vencimiento.
 																<DatePicker dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha}" displayFormat="dd/MM/yyyy" width="100%"
 																	editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}"
 																	enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableSegHig'}">
+																-->
+																<DatePicker dateValue="{HabilitacionModel>/SeguridadHigiene_Fecha}" displayFormat="dd/MM/yyyy" width="100%" enabled="false">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
 																</DatePicker>
+																<!-- FIN MOD TRNS #PT-18 -->
 																<Text width="100%" textAlign="End" text="{i18n>Firma}:" class="topLabel TextEnd">
 																	<layoutData>
 																		<l:GridData span="XL1 L1 M3 S12"/>
@@ -705,6 +709,10 @@
 												<VBox class="colorGray">
 													<items>
 														<Label text="{i18n>textEvaCali}" wrapping="true" class="sapUiSmallMarginBegin sapUiSmallMarginTop"/>
+														<!-- INI MOD TRNS PT-98 - Aprobado Si/No y Fecha de Examen se comentan por redundantes: el dato
+														     ya se carga en Seguridad Operativa. Se conserva el bloque por si el cliente lo pide de vuelta.
+														-->
+														<!--
 														<f:Form editable="true" class="licenciaGrid sapUiSmallMarginTop" width="1100px">
 															<f:layout>
 																<f:ResponsiveGridLayout labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="1" emptySpanL="1" emptySpanM="1" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" singleContainerFullSize="false"/>
@@ -763,8 +771,9 @@
 																</f:FormContainer>
 															</f:formContainers>
 														</f:Form>
+														-->
 														<!-- PT-98: "Equipo Examinador" pegado a su primera fila: sin titleTable y sin margen superior en la primera grilla -->
-														<Title text="{i18n>textEquipoExa}" wrapping="true" class="TitleBold" titleStyle="H6" width="auto" textAlign="Begin"/>
+														<Title text="{i18n>textEquipoExa}" wrapping="true" class="TitleBold tituloEquipoExa" titleStyle="H6" width="auto" textAlign="Begin"/>
 														<l:Grid class="gridExaminador gridFirma" width="1100px" hSpacing="1" vSpacing="0">
 															<l:content>
 																<Text text="{i18n>NombreApellido}:" class="topLabel TextEnd">
@@ -772,7 +781,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Examinador1_Nombre}" visible="true" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Examinador1_Nombre}" visible="true" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -782,7 +791,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Examinador1_Fecha}" width="100%">
+																<DatePicker enabled="false" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Examinador1_Fecha}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -806,7 +815,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Examinador2_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Examinador2_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -816,7 +825,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Examinador2_Fecha}" width="100%">
+																<DatePicker enabled="false" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Examinador2_Fecha}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -840,7 +849,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Examinador3_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Examinador3_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -850,7 +859,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker editable="false" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Examinador3_Fecha}" width="100%">
+																<DatePicker enabled="false" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Examinador3_Fecha}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -880,7 +889,7 @@
 														<Title text="{i18n>GerenciaRegional}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
 														<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
 														<Button icon="sap-icon://save" press="onGuardarGerReg" text="{i18n>GuardarDatos}"
-															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}"/>
+															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}"/>
 														<!-- FIN MOD TRNS #PT-18 -->
 													</items>
 												</HBox>
@@ -903,7 +912,7 @@
 																				<!-- INI MOD TRNS #XXXXXX - edicion por rol PT15
 																				<ComboBox selectedKey="{HabilitacionModel>/Gerente_Reg_Anio_Venc}" change="onChangeDateGerRegional" editable="false">
 																				-->
-																				<ComboBox class="sapUiTinyMarginTop" selectedKey="{HabilitacionModel>/Gerente_Reg_Anio_Venc}" change="onChangeDateGerRegional" width="100%" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																				<ComboBox class="sapUiTinyMarginTop" selectedKey="{HabilitacionModel>/Gerente_Reg_Anio_Venc}" change="onChangeDateGerRegional" width="100%" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}">
 																					<items>
 																						<core:Item text="1 Año" key="1"/>
 																						<core:Item text="2 Años" key="2"/>
@@ -914,12 +923,12 @@
 																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
 																				</ComboBox>
-																				<Input class="sapUiTinyMarginTop" type="Number" value="{HabilitacionModel>/Gerente_Reg_Cantidad_Venc}" width="100%" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																				<Input class="sapUiTinyMarginTop" type="Number" value="{HabilitacionModel>/Gerente_Reg_Cantidad_Venc}" width="100%" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}">
 																					<layoutData>
 																						<l:GridData span="XL1 L1 M1 S6"/>
 																					</layoutData>
 																				</Input>
-																				<ComboBox class="sapUiTinyMarginTop" selectedKey="{HabilitacionModel>/Gerente_Reg_Tiempo_Venc}" change="onChangeTimeGerRegional" width="100%" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																				<ComboBox class="sapUiTinyMarginTop" selectedKey="{HabilitacionModel>/Gerente_Reg_Tiempo_Venc}" change="onChangeTimeGerRegional" width="100%" editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}">
 																					<items>
 																						<core:Item text="Días" key="Dia"/>
 																						<core:Item text="Meses" key="Mes"/>
@@ -950,8 +959,8 @@
 																					</layoutData>
 																				</Label>
 																				<TextArea id="licObsGerReg" rows="3" value="{HabilitacionModel>/Gerente_Reg_Observacion}"
-																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}"
+																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GER_REG'} ], formatter: '.onEnableGerReg'}">
 																					<layoutData>
 																						<l:GridData span="XL8 L8 M8 S12"/>
 																					</layoutData>
@@ -974,19 +983,24 @@
 																<Input type="Text" value="{HabilitacionModel>/Gerente_Reg_Nombre}"
 																	enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},'i18n>Gerente_Reg'], formatter: '.onEnableRol2'}" editable="false"/>
 																-->
+																<!-- INI MOD TRNS #PT-18 - solo lectura: muestra QUIEN intervino. La sobrescritura conserva
+																     Nombre y Firma desde la base, asi que editarlo no tenia ningun efecto.
 																<Input type="Text" value="{HabilitacionModel>/Gerente_Reg_Nombre}" width="100%"
 																	editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGerReg'}">
+																-->
+																<Input type="Text" value="{HabilitacionModel>/Gerente_Reg_Nombre}" width="100%" enabled="false">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
 																</Input>
+																<!-- FIN MOD TRNS #PT-18 -->
 																<!-- FIN MOD TRNS #XXXXXX -->
 																<Text width="100%" textAlign="End" text="{i18n>Fecha}:" class="topLabel TextEnd">
 																	<layoutData>
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker displayFormat="dd/MM/yyyy" editable="false" dateValue="{HabilitacionModel>/Gerente_Reg_Fecha}" width="100%">
+																<DatePicker displayFormat="dd/MM/yyyy" enabled="false" dateValue="{HabilitacionModel>/Gerente_Reg_Fecha}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -1120,7 +1134,7 @@
 														<Title text="{i18n>GestionCalidad}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
 														<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
 														<Button icon="sap-icon://save" press="onGuardarGestCalidad" text="{i18n>GuardarDatos}"
-															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGestCalidad'}"/>
+															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GEST_CALIDAD'} ], formatter: '.onEnableGestCalidad'}"/>
 														<!-- FIN MOD TRNS #PT-18 -->
 													</items>
 												</HBox>
@@ -1147,7 +1161,7 @@
 																					</layoutData>
 																				</Label>
 																				<TextArea id="licObsGestCalidad" value="{HabilitacionModel>/ObservacionGestionCalidad}" rows="3" cols="110" maxLength="0"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGestCalidad'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/GEST_CALIDAD'} ], formatter: '.onEnableGestCalidad'}">
 																					<layoutData>
 																						<l:GridData span="XL8 L8 M8 S12"/>
 																					</layoutData>
@@ -1162,7 +1176,7 @@
 																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
 																					</layoutData>
 																				</Label>
-																				<DatePicker id="licFechaGc" class="sapUiTinyMarginTop" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Gestion_Calidad_Fecha_Habilitacion}" editable="false" width="100%">
+																				<DatePicker id="licFechaGc" class="sapUiTinyMarginTop" displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Gestion_Calidad_Fecha_Habilitacion}" enabled="false" width="100%">
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12"/>
 																					</layoutData>
@@ -1180,7 +1194,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Gestion_Calidad_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Gestion_Calidad_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -1190,7 +1204,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Gestion_Calidad_Fecha}" editable="false" width="100%">
+																<DatePicker displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Gestion_Calidad_Fecha}" enabled="false" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -1220,7 +1234,7 @@
 														<Title text="{i18n>textTitleVerif}" class="TitleSection" titleStyle="H4" width="auto" textAlign="Begin" visible="true"/>
 														<!-- INI MOD TRNS #PT-18 - un boton Guardar por seccion, habilitado por su formatter -->
 														<Button icon="sap-icon://save" press="onGuardarRepDireccion" text="{i18n>GuardarDatos}"
-															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRepDireccion'}"/>
+															enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/REP_DIRECCION'} ], formatter: '.onEnableRepDireccion'}"/>
 														<!-- FIN MOD TRNS #PT-18 -->
 													</items>
 												</HBox>
@@ -1248,7 +1262,7 @@
 																					</layoutData>
 																				</Label>
 																				<TextArea id="licObsRepDireccion" rows="3" cols="110" value="{HabilitacionModel>/Rep_Direccion_Observacion}"
-																					editable="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRepDireccion'}">
+																					enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'},{path: 'HabilitacionModel>/IntervencionVigente/REP_DIRECCION'} ], formatter: '.onEnableRepDireccion'}">
 																					<layoutData>
 																						<l:GridData span="XL8 L8 M8 S12"/>
 																					</layoutData>
@@ -1267,7 +1281,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" editable="false" value="{HabilitacionModel>/Rep_Direccion_Nombre}" width="100%">
+																<Input type="Text" enabled="false" value="{HabilitacionModel>/Rep_Direccion_Nombre}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -1277,7 +1291,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Rep_Direccion_Fecha}" editable="false" width="100%">
+																<DatePicker displayFormat="dd/MM/yyyy" dateValue="{HabilitacionModel>/Rep_Direccion_Fecha}" enabled="false" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -1319,20 +1333,54 @@
 																	<f:formElements>
 																		<f:FormElement>
 																			<f:fields>
-																				<Label wrapping="true" labelFor="licFechaVigencia" text="{i18n>FechaVigencia}:" class="topLabel">
+																				<Label wrapping="true" labelFor="licFechaInicioHab" text="{i18n>FechaInicioHab}:" class="topLabel">
 																					<layoutData>
 																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
 																					</layoutData>
 																				</Label>
-																				<DatePicker id="licFechaVigencia" displayFormat="dd/MM/yyyy" editable="false" dateValue="{HabilitacionModel>/Direccion_Tecnica_Fecha_Vigencia}" width="100%">
+																				<!-- INI MOD TRNS PT-98 - Fecha de Inicio de la Habilitacion: solo lectura, nadie la escribe. -->
+																				<DatePicker id="licFechaInicioHab" displayFormat="dd/MM/yyyy" editable="false" enabled="false" dateValue="{HabilitacionModel>/FechaCreacion}" width="100%">
 																					<layoutData>
-																						<l:GridData span="XL3 L3 M3 S12"/>
+																						<l:GridData span="XL2 L2 M2 S12"/>
+																					</layoutData>
+																				</DatePicker>
+																				<!-- FIN MOD TRNS PT-98 -->
+																				<Label wrapping="true" width="100%" textAlign="End" labelFor="licFechaVigencia" text="{i18n>FechaVigencia}:" class="topLabel TextEnd">
+																					<layoutData>
+																						<l:GridData span="XL4 L4 M4 S12"/>
+																					</layoutData>
+																				</Label>
+																				<DatePicker id="licFechaVigencia" displayFormat="dd/MM/yyyy" enabled="false" dateValue="{HabilitacionModel>/Direccion_Tecnica_Fecha_Vigencia}" width="100%">
+																					<layoutData>
+																						<l:GridData span="XL2 L2 M2 S12"/>
 																					</layoutData>
 																				</DatePicker>
 																			</f:fields>
 																		</f:FormElement>
 																	</f:formElements>
 																</f:FormContainer>
+																<!-- INI MOD TRNS PT-98 - Observaciones de GPOR, como en My Inbox. El dato sale del
+																     Datosadicionales de la intervencion (ver _resolver en onBindingIntervenciones).
+																     Solo lectura: esta seccion no tiene boton Guardar en esta app. -->
+																<f:FormContainer>
+																	<f:formElements>
+																		<f:FormElement>
+																			<f:fields>
+																				<Label wrapping="true" labelFor="licObsGPOR" text="{i18n>Observaciones}:" class="topLabel">
+																					<layoutData>
+																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
+																					</layoutData>
+																				</Label>
+																				<TextArea id="licObsGPOR" rows="3" cols="110" value="{HabilitacionModel>/Direccion_Tecnica_Observacion}" enabled="false">
+																					<layoutData>
+																						<l:GridData span="XL8 L8 M8 S12"/>
+																					</layoutData>
+																				</TextArea>
+																			</f:fields>
+																		</f:FormElement>
+																	</f:formElements>
+																</f:FormContainer>
+																<!-- FIN MOD TRNS PT-98 -->
 															</f:formContainers>
 														</f:Form>
 														<l:Grid class="sapUiSmallMarginTop gridExaminador gridFirma" width="1100px" hSpacing="1" vSpacing="0">
@@ -1342,7 +1390,7 @@
 																		<l:GridData span="XL3 L3 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<Input type="Text" value="{HabilitacionModel>/Direccion_Tecnica_Nombre}" editable="false" width="100%">
+																<Input type="Text" value="{HabilitacionModel>/Direccion_Tecnica_Nombre}" enabled="false" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL3 L3 M9 S12"/>
 																	</layoutData>
@@ -1352,7 +1400,7 @@
 																		<l:GridData span="XL1 L1 M3 S12"/>
 																	</layoutData>
 																</Text>
-																<DatePicker displayFormat="dd/MM/yyyy" editable="false" dateValue="{HabilitacionModel>/Direccion_Tecnica_Fecha}" width="100%">
+																<DatePicker displayFormat="dd/MM/yyyy" enabled="false" dateValue="{HabilitacionModel>/Direccion_Tecnica_Fecha}" width="100%">
 																	<layoutData>
 																		<l:GridData span="XL2 L2 M9 S12"/>
 																	</layoutData>
@@ -1483,9 +1531,17 @@
 				</content>
 				<footer>
 					<Toolbar>
+						<!-- INI MOD TRNS PT-98 - boton unico de Adjuntar Archivo, alineado a la izquierda de la barra inferior. -->
+						<u:FileUploader class="fileUploader" tooltip="{i18n>AdjArchivo}" buttonText="{i18n>AdjArchivo}"
+							buttonOnly="true" change="onChangeFile" icon="sap-icon://attachment"/>
+						<!-- FIN MOD TRNS PT-98 -->
 						<ToolbarSpacer/>
 						<!-- INI MOD TRNS #PT-18 - el boton unico de Guardar se reemplazo por un boton por seccion,
-						     cada uno junto a los campos que edita y habilitado por su propio formatter. -->
+						     cada uno junto a los campos que edita y habilitado por su propio formatter.
+						     Originales de 3dc9b09 (el primero ya venia comentado por #XXXXXX):
+						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableRol3'}" text="{i18n>GuardarDatos}" />
+						<Button icon="sap-icon://edit" press="onUpdateData" visible="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Area'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableGuardar'}" text="{i18n>GuardarDatos}" />
+						-->
 						<!-- FIN MOD TRNS #PT-18 -->
 						<Button icon="sap-icon://edit" press="onChangeStatus" visible="{ path: 'Habilitacion>/Estado', formatter: '.ShowButtonStatus'}" text="{i18n>CambiarEstado}" enabled="{ parts : [{path: 'UserJsonModelVISTA>/User/0/roles'},{path: 'Habilitacion>/Estado'} ], formatter: '.onEnableChangeStatus'}" />
 					    <Button icon="sap-icon://print" press="_onDonwloadHabilitacion" text="{i18n>Imprimir}"/>
