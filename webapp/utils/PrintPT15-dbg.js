@@ -48,7 +48,12 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 				personalFechaNac: oModelGral.fechaNac ? oModel.fechaNac : "-",
 				personalDNI: oModelGral.Documento ? oModelGral.Documento : "-",
 				personaRegArea: this._getRegionArea(oModelGral, oRegionModel),
-				personaFuncion: this._getmFunction(oModelGral, oModelFunciones)
+				// INI MOD TRNS #PT-99 - Tipo de la licencia (lo calcula detailHabPT15 en HabilitacionModel)
+				// personaFuncion: this._getmFunction(oModelGral, oModelFunciones)
+				personaFuncion: this._getmFunction(oModelGral, oModelFunciones),
+				tipoHabilitacion: oModelHab.esRehabilitacion === true ? Texts.getTranslation("rehabilitacion") :
+					(oModelHab.esRehabilitacion === false ? Texts.getTranslation("habilitacion") : "-")
+				// FIN MOD TRNS #PT-99
 			};
 			//Seccion 3 formulario
 			let entExpPreviaTrabajo = {
@@ -190,7 +195,11 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 					"Legajo: " + datosAgente.personalLegajo + "\n" +
 					"Nombre/s y Apellido/s: " + datosAgente.personalNomApe + "\n" +
 					"Doc. de Identidad: " + datosAgente.personalDNI + "\n" +
-					"Region / Area: " + datosAgente.personaRegArea + "\n",
+					// INI MOD TRNS #PT-99
+					// "Region / Area: " + datosAgente.personaRegArea + "\n",
+					"Region / Area: " + datosAgente.personaRegArea + "\n" +
+					"Tipo: " + datosAgente.tipoHabilitacion + "\n",
+					// FIN MOD TRNS #PT-99
 				style: 'itemsColumn'
 			});
 			// -------   Entrenamiento / Experiencia previa en el trabajo ---------- //
@@ -259,6 +268,8 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 			});
 			//------------ FIN conformidad del Empleado ----------------------------------------------------------------//
 			// -------   Evaluación del Desempeño en la Operación ---------- //
+			// INI MOD TRNS #PT-99 - con Habilitacion la seccion no se imprime (null = no determinado: se imprime)
+			if (oModelHab.esRehabilitacion !== false) {
 			_contenido.push({
 				text: "\n" + Texts.getTranslation("textTitleEvaDesemp"),
 				style: 'title'
@@ -288,6 +299,8 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 					_evalDesempeño
 				]
 			});
+			}
+			// FIN MOD TRNS #PT-99
 			// ----------- FIN Evaluación del Desempeño en la Operación  ----------------------------------------//
 			// -------   Medicina Laboral ---------------------------------------------------------------------- //
 			_contenido.push({

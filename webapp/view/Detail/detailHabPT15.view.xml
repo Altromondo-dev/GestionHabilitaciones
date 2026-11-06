@@ -198,6 +198,28 @@
 																				</ComboBox>
 																			</f:fields>
 																		</f:FormElement>
+																		<!-- INI MOD TRNS #PT-99 - Tipo derivado (solo lectura). Mientras no se determina no se marca ninguno. -->
+																		<f:FormElement>
+																			<f:fields>
+																				<Label wrapping="true" text="{i18n>tipoHab}:" class="topLabel">
+																					<layoutData>
+																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
+																					</layoutData>
+																				</Label>
+																				<HBox width="100%" renderType="Bare" alignItems="Start" class="tipoHabBox">
+																					<items>
+																						<RadioButton text="{i18n>habilitacion}" groupName="TipoHabilitacion" enabled="false"
+																							selected="{= ${HabilitacionModel>/esRehabilitacion} === false }"/>
+																						<RadioButton text="{i18n>rehabilitacion}" groupName="TipoHabilitacion" enabled="false" class="sapUiSmallMarginBegin"
+																							selected="{= ${HabilitacionModel>/esRehabilitacion} === true }"/>
+																					</items>
+																					<layoutData>
+																						<l:GridData span="XL9 L9 M9 S12"/>
+																					</layoutData>
+																				</HBox>
+																			</f:fields>
+																		</f:FormElement>
+																		<!-- FIN MOD TRNS #PT-99 -->
 																	</f:formElements>
 																</f:FormContainer>
 															</f:formContainers>
@@ -309,7 +331,11 @@
 											</items>
 										</VBox>
 										<!-- Evaluacion del Desempeno en la Operacion -->
+										<!-- INI MOD TRNS #PT-99 - con Habilitacion la seccion no se muestra (null = no determinado: se muestra)
 										<VBox class="moduloRol sapUiMediumMarginTop">
+										-->
+										<VBox class="moduloRol sapUiMediumMarginTop" visible="{= ${HabilitacionModel>/esRehabilitacion} !== false }">
+										<!-- FIN MOD TRNS #PT-99 -->
 											<items>
 												<HBox width="100%" height="2.75rem" alignItems="End" class="marginTopTitle" justifyContent="SpaceBetween">
 													<items>
@@ -320,6 +346,29 @@
 												<VBox class="colorGray">
 													<items>
 														<Label text="{i18n>textEvaDesemp}" wrapping="true" class="sapUiSmallMarginBegin sapUiSmallMarginTop"/>
+														<!-- INI MOD TRNS #PT-99 - se repite el Tipo aca, como en cargahabpt15. groupName propio:
+														     con el mismo que Datos Personales los dos pares de radios se excluirian entre si. -->
+														<l:Grid class="sapUiSmallMarginTop gridExaminador gridFirma" width="1100px" hSpacing="1" vSpacing="0">
+															<l:content>
+																<Text text="{i18n>tipoHab}:" class="topLabel">
+																	<layoutData>
+																		<l:GridData span="XL3 L3 M3 S12"/>
+																	</layoutData>
+																</Text>
+																<HBox width="100%" renderType="Bare" alignItems="Start" class="tipoHabBox">
+																	<items>
+																		<RadioButton text="{i18n>habilitacion}" groupName="TipoHabEvaDesemp" enabled="false"
+																			selected="{= ${HabilitacionModel>/esRehabilitacion} === false }"/>
+																		<RadioButton text="{i18n>rehabilitacion}" groupName="TipoHabEvaDesemp" enabled="false" class="sapUiSmallMarginBegin"
+																			selected="{= ${HabilitacionModel>/esRehabilitacion} === true }"/>
+																	</items>
+																	<layoutData>
+																		<l:GridData span="XL9 L9 M9 S12"/>
+																	</layoutData>
+																</HBox>
+															</l:content>
+														</l:Grid>
+														<!-- FIN MOD TRNS #PT-99 -->
 														<l:Grid class="sapUiSmallMarginTop gridExaminador gridFirma" width="1100px" hSpacing="1" vSpacing="0">
 															<l:content>
 																<Text text="{i18n>NombreApellido}:" class="topLabel TextEnd">

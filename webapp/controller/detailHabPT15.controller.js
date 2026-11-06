@@ -428,6 +428,9 @@ sap.ui.define([
             // el filtro del maestro de puestos.
             this.LoadPuestosFunciones();
             // FIN MOD TRNS #PT-98
+            // INI MOD TRNS #PT-99 - Tipo (Habilitacion / Rehabilitacion) de la licencia
+            this._determinarTipoHabilitacion();
+            // FIN MOD TRNS #PT-99
             // INI MOD TRNS #PT-98 - Fecha de Inicio de la Habilitacion (solo lectura) en la seccion GPOR.
             // Si Habtecnicas2PT15Set no expone FechaCreacion, el campo quedaria vacio sin dar error, asi
             // que se completa desde la fila seleccionada del listado (que la trae de HabTecnicasSet).
@@ -468,6 +471,80 @@ sap.ui.define([
             oModel.setProperty("/FechaCreacion", null);
         },
         // FIN MOD TRNS #PT-98
+        // INI MOD TRNS #PT-99 - Rehabilitacion si el legajo tiene al menos OTRA licencia OTORGADA en
+        // la misma Empresa y la misma Funcion (Region no interviene). Mismo criterio que cargahabpt15;
+        // aca la licencia ya existe, asi que se excluye la propia por Idhabilitacion. Se cuentan todas
+        // las demas, anteriores o posteriores.
+        // esRehabilitacion: true / false / null (no determinado: no se marca ninguna opcion y la
+        // seccion Evaluacion queda visible, para no ocultar datos por un error de lectura).
+        _determinarTipoHabilitacion: function () {
+            var oModel = this.getView().getModel("HabilitacionModel");
+            var oHab = this.getView().getModel("Habilitacion").getData();
+            var sIdhab = oHab.Idhabilitacion;
+            oModel.setProperty("/esRehabilitacion", null);
+            if (!oHab.Legajo || !oHab.Empresa || !oHab.Tipohab) {
+                return;
+            }
+            var that = this;
+            Promise.all([
+                this._leerPuestosPT99(oHab.Empresa),
+                new Promise(function (resolve, reject) {
+                    HabilitacionServices.loadLicenciasLegajoPT15(String(oHab.Legajo), oHab.Empresa, resolve, reject);
+                })
+            ]).then(function (aRes) {
+                // La vista se reutiliza: si mientras tanto se abrio otra licencia, no se pisa su Tipo.
+                if (that.getView().getModel("Habilitacion").getProperty("/Idhabilitacion") !== sIdhab) {
+                    return;
+                }
+                var oCodigos = that._codigosFuncionPT99(oHab.Tipohab, aRes[0]);
+                var iOtras = aRes[1].filter(function (h) {
+                    return h.Idhabilitacion !== sIdhab
+                        && h.Empresa === oHab.Empresa
+                        && oCodigos[h.Tipohab] === true
+                        && HabilitacionServices.ESTADOS_OTORGADOS.indexOf(h.Estado) > -1;
+                }).length;
+                oModel.setProperty("/esRehabilitacion", iOtras > 0);
+            }).catch(function (oError) {
+                console.error("PT-99: no se pudo determinar el Tipo de la licencia", oError);
+            });
+        },
+
+        // Maestro PuestoAreaPT15Set por Empresa, con cache propia: la de PT-98 se pide una sola vez
+        // por instancia de la vista y no se renueva si la siguiente licencia es de otra Empresa.
+        _leerPuestosPT99: function (sEmpresa) {
+            this._oPuestosPT99 = this._oPuestosPT99 || {};
+            if (!this._oPuestosPT99[sEmpresa]) {
+                this._oPuestosPT99[sEmpresa] = new Promise(function (resolve, reject) {
+                    PuestoAreaPT15Services.LoadPuestosAreas(sEmpresa, function (oData) {
+                        resolve((oData && oData.results) || []);
+                    }, reject);
+                });
+                // Si falla, se reintenta en la proxima apertura.
+                this._oPuestosPT99[sEmpresa].catch(function () {
+                    delete this._oPuestosPT99[sEmpresa];
+                }.bind(this));
+            }
+            return this._oPuestosPT99[sEmpresa];
+        },
+
+        // Codigos con los que pudo grabarse la Funcion: la clase PE*/PB* (desde PT-22.4) y los
+        // codigos de puesto 20-25 (antes de PT-22.4) que el maestro asocia a esa clase.
+        _codigosFuncionPT99: function (sTipohab, aPuestos) {
+            var oFila = aPuestos.filter(function (r) {
+                return r.TipoHab === sTipohab || r.Puesto === sTipohab;
+            })[0];
+            var sClase = oFila ? oFila.TipoHab : sTipohab;
+            var oCodigos = {};
+            oCodigos[sTipohab] = true;
+            oCodigos[sClase] = true;
+            aPuestos.forEach(function (r) {
+                if (r.TipoHab === sClase) {
+                    oCodigos[r.Puesto] = true;
+                }
+            });
+            return oCodigos;
+        },
+        // FIN MOD TRNS #PT-99
         SuccessCallBackInt: function (data) {
             var Intervenciones = data.results;
             // INI MOD TRNS #100775 - exponer texto de duplicación en el header
