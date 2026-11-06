@@ -3,6 +3,44 @@ sap.ui.define([
 ], function (oDataServices) {
     "use strict";
     return {
+        // INI MOD TRNS #PT-99 - estados que cuentan como licencia otorgada para determinar el Tipo
+        // (Habilitacion / Rehabilitacion). Misma lista que cargahabpt15.
+        ESTADOS_OTORGADOS: ["H", "D", "S", "X", "Y", "Z", "F"],
+
+        // Licencias PT15 del legajo en la empresa, SIN $expand (GET_ENTITYSET). Funcion y Estado se
+        // filtran en el front: el backend ignora esos filtros.
+        // Legajo es la unica key de Habtecnicas2PT15, asi que todas las filas del legajo comparten
+        // clave en la cache del ODataModel. Por eso (1) se lee con una instancia propia del modelo,
+        // para no pisar el registro que ya muestra el detalle, y (2) las filas se toman del body crudo.
+        loadLicenciasLegajoPT15: function (sLegajo, sEmpresa, onSuccessCallback, onErrorCallback) {
+            if (!this._oModelLicenciasPT15) {
+                this._oModelLicenciasPT15 = new sap.ui.model.odata.v2.ODataModel(
+                    oDataServices.getModel().sServiceUrl, { useBatch: false });
+            }
+            this._oModelLicenciasPT15.read("/Habtecnicas2PT15Set", {
+                filters: [
+                    new sap.ui.model.Filter("Legajo", sap.ui.model.FilterOperator.EQ, sLegajo),
+                    new sap.ui.model.Filter("Clasehab", sap.ui.model.FilterOperator.EQ, "H0003"),
+                    new sap.ui.model.Filter("Empresa", sap.ui.model.FilterOperator.EQ, sEmpresa)
+                ],
+                success: function (oData, oResponse) {
+                    var aModelo = (oData && oData.results) || [],
+                        aCrudas = aModelo;
+                    try {
+                        aCrudas = JSON.parse(oResponse.body).d.results || aModelo;
+                    } catch (e) { /* sin body: se usan las filas del modelo */ }
+                    // Diagnostico: si el modelo colapsa filas por la key, los Id no coinciden.
+                    var fnIds = function (a) { return a.map(function (h) { return h.Idhabilitacion; }).join(","); };
+                    if (fnIds(aModelo) !== fnIds(aCrudas)) {
+                        console.warn("PT-99: filas colapsadas por la key Legajo", fnIds(aModelo), "vs", fnIds(aCrudas));
+                    }
+                    onSuccessCallback(aCrudas);
+                },
+                error: onErrorCallback
+            });
+        },
+        // FIN MOD TRNS #PT-99
+
         loadHabilitacion: function (idHabilitacion, claseHab, oView, callback) {
             var odataModel = oDataServices.getModel();
             odataModel.read("/HabTecnicas2Set", {

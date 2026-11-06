@@ -481,3 +481,9 @@
 }
 
 /* ---- FIN MOD TRNS PT-98 / EF ---- */
+
+/* INI MOD TRNS #PT-99 - el radio toma el ancho de su texto (igual que cargahabpt15) */
+.tipoHabBox .sapMRb {
+    flex: 0 0 auto;
+}
+/* FIN MOD TRNS #PT-99 */
