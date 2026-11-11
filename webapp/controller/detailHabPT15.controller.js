@@ -473,8 +473,16 @@ sap.ui.define([
         // FIN MOD TRNS #PT-98
         // INI MOD TRNS #PT-99 - Rehabilitacion si el legajo tiene al menos OTRA licencia OTORGADA en
         // la misma Empresa y la misma Funcion (Region no interviene). Mismo criterio que cargahabpt15;
-        // aca la licencia ya existe, asi que se excluye la propia por Idhabilitacion. Se cuentan todas
-        // las demas, anteriores o posteriores.
+        // aca la licencia ya existe, asi que se excluye la propia por Idhabilitacion.
+        // INI MOD TRNS #PT22.1 - solo cuentan las ANTERIORES a esta. Contando tambien las posteriores,
+        // una licencia que nacio Habilitacion pasaba a mostrarse como Rehabilitacion en cuanto se
+        // otorgaba otra del mismo legajo/funcion, contradiciendo el valor que el workflow congelo en
+        // context.primeraVez al darla de alta. El Tipo es una propiedad historica de la licencia, no
+        // una funcion del estado actual de la tabla.
+        // Los empates de fecha se CUENTAN (se descarta solo lo estrictamente posterior): si la fecha
+        // viene con hora el empate es practicamente imposible, y si viniera con precision de dia es
+        // preferible mostrar la seccion de mas que esconder una evaluacion ya cargada.
+        // FIN MOD TRNS #PT22.1
         // esRehabilitacion: true / false / null (no determinado: no se marca ninguna opcion y la
         // seccion Evaluacion queda visible, para no ocultar datos por un error de lectura).
         _determinarTipoHabilitacion: function () {
@@ -497,9 +505,27 @@ sap.ui.define([
                     return;
                 }
                 var oCodigos = that._codigosFuncionPT99(oHab.Tipohab, aRes[0]);
+                // INI MOD TRNS #PT22.1 - la fecha propia se toma de la MISMA lectura (la propia fila
+                // esta en la lista; se descarta despues por Idhabilitacion), no del modelo del detalle:
+                // asi los dos lados de la comparacion vienen en el mismo formato.
+                var oPropia = aRes[1].filter(function (h) { return h.Idhabilitacion === sIdhab; })[0];
+                var iFechaPropia = that._fechaCreacionPT22(oPropia);
+                if (iFechaPropia === null) {
+                    // Sin fecha propia no hay con que ordenar: se cuentan todas, como antes de PT22.1.
+                    console.warn("PT22.1: la licencia", sIdhab, "no trae FechaCreacion; se cuentan todas las demas");
+                }
+                // FIN MOD TRNS #PT22.1
                 var iOtras = aRes[1].filter(function (h) {
-                    return h.Idhabilitacion !== sIdhab
-                        && h.Empresa === oHab.Empresa
+                    if (h.Idhabilitacion === sIdhab) {
+                        return false;
+                    }
+                    // INI MOD TRNS #PT22.1 - fuera las posteriores
+                    var iFecha = that._fechaCreacionPT22(h);
+                    if (iFechaPropia !== null && iFecha !== null && iFecha > iFechaPropia) {
+                        return false;
+                    }
+                    // FIN MOD TRNS #PT22.1
+                    return h.Empresa === oHab.Empresa
                         && oCodigos[h.Tipohab] === true
                         && HabilitacionServices.ESTADOS_OTORGADOS.indexOf(h.Estado) > -1;
                 }).length;
@@ -508,6 +534,24 @@ sap.ui.define([
                 console.error("PT-99: no se pudo determinar el Tipo de la licencia", oError);
             });
         },
+
+        // INI MOD TRNS #PT22.1 - FechaCreacion de una licencia, en ms, o null si no viene.
+        // Hay dos formatos posibles y hay que contemplar los dos: loadLicenciasLegajoPT15 devuelve las
+        // filas del BODY CRUDO (JSON.parse(oResponse.body).d.results) para esquivar el colapso por la
+        // key Legajo, y ahi las fechas de OData v2 llegan como "/Date(1793964052724)/"; si en algun
+        // momento esa lectura volviera a tomar las filas del modelo, llegarian como Date de JS.
+        _fechaCreacionPT22: function (oLicencia) {
+            var vFecha = oLicencia && oLicencia.FechaCreacion;
+            if (!vFecha) {
+                return null;
+            }
+            if (vFecha instanceof Date) {
+                return vFecha.getTime();
+            }
+            var aMatch = /\/Date\((-?\d+)/.exec(String(vFecha));
+            return aMatch ? parseInt(aMatch[1], 10) : null;
+        },
+        // FIN MOD TRNS #PT22.1
 
         // Maestro PuestoAreaPT15Set por Empresa, con cache propia: la de PT-98 se pide una sola vez
         // por instancia de la vista y no se renueva si la siguiente licencia es de otra Empresa.
