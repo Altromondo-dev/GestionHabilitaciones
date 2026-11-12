@@ -83,6 +83,29 @@
 																		</ComboBox>
 																	</f:fields>
 																</f:FormElement>
+																<!-- MOVIDO #PT22.1 - el campo "Tipo" va debajo de Funcion, fuera de Datos Personales. -->
+																<!-- INI MOD TRNS #PT-99 - Tipo derivado (solo lectura). Mientras no se determina no se marca ninguno. -->
+																<f:FormElement>
+																	<f:fields>
+																		<Label wrapping="true" text="{i18n>tipoHab}:" class="topLabel">
+																			<layoutData>
+																				<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
+																			</layoutData>
+																		</Label>
+																		<HBox width="100%" renderType="Bare" alignItems="Start" class="tipoHabBox">
+																			<items>
+																				<RadioButton text="{i18n>habilitacion}" groupName="TipoHabilitacion" enabled="false"
+																					selected="{= ${HabilitacionModel>/esRehabilitacion} === false }"/>
+																				<RadioButton text="{i18n>rehabilitacion}" groupName="TipoHabilitacion" enabled="false" class="sapUiSmallMarginBegin"
+																					selected="{= ${HabilitacionModel>/esRehabilitacion} === true }"/>
+																			</items>
+																			<layoutData>
+																				<l:GridData span="XL9 L9 M9 S12"/>
+																			</layoutData>
+																		</HBox>
+																	</f:fields>
+																</f:FormElement>
+																<!-- FIN MOD TRNS #PT-99 -->
 															</f:formElements>
 														</f:FormContainer>
 													</f:formContainers>
@@ -198,28 +221,6 @@
 																				</ComboBox>
 																			</f:fields>
 																		</f:FormElement>
-																		<!-- INI MOD TRNS #PT-99 - Tipo derivado (solo lectura). Mientras no se determina no se marca ninguno. -->
-																		<f:FormElement>
-																			<f:fields>
-																				<Label wrapping="true" text="{i18n>tipoHab}:" class="topLabel">
-																					<layoutData>
-																						<l:GridData span="XL3 L3 M3 S12" linebreak="true"/>
-																					</layoutData>
-																				</Label>
-																				<HBox width="100%" renderType="Bare" alignItems="Start" class="tipoHabBox">
-																					<items>
-																						<RadioButton text="{i18n>habilitacion}" groupName="TipoHabilitacion" enabled="false"
-																							selected="{= ${HabilitacionModel>/esRehabilitacion} === false }"/>
-																						<RadioButton text="{i18n>rehabilitacion}" groupName="TipoHabilitacion" enabled="false" class="sapUiSmallMarginBegin"
-																							selected="{= ${HabilitacionModel>/esRehabilitacion} === true }"/>
-																					</items>
-																					<layoutData>
-																						<l:GridData span="XL9 L9 M9 S12"/>
-																					</layoutData>
-																				</HBox>
-																			</f:fields>
-																		</f:FormElement>
-																		<!-- FIN MOD TRNS #PT-99 -->
 																	</f:formElements>
 																</f:FormContainer>
 															</f:formContainers>

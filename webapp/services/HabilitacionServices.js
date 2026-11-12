@@ -5,7 +5,13 @@ sap.ui.define([
     return {
         // INI MOD TRNS #PT-99 - estados que cuentan como licencia otorgada para determinar el Tipo
         // (Habilitacion / Rehabilitacion). Misma lista que cargahabpt15.
-        ESTADOS_OTORGADOS: ["H", "D", "S", "X", "Y", "Z", "F"],
+        // INI MOD TRNS #PT22.1 - se saca "D" (Revocado). La tarjeta lo pide explicitamente:
+        // "Historial solo con 'Revocado' (no cuenta segun la reunion): se marca 'Habilitacion'".
+        // La lista tiene que seguir siendo IDENTICA a la de cargahabpt15/services/HabilitacionServices.js:
+        // si una cambia y la otra no, el Tipo del alta y el del detalle dejan de coincidir.
+        // ESTADOS_OTORGADOS: ["H", "D", "S", "X", "Y", "Z", "F"],
+        ESTADOS_OTORGADOS: ["H", "S", "X", "Y", "Z", "F"],
+        // FIN MOD TRNS #PT22.1
 
         // Licencias PT15 del legajo en la empresa, SIN $expand (GET_ENTITYSET). Funcion y Estado se
         // filtran en el front: el backend ignora esos filtros.
