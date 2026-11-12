@@ -186,6 +186,14 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 				text: "\n" + "Función: " + datosAgente.personaFuncion,
 				style: 'title'
 			});
+			// INI MOD TRNS #PT22.1 - el Tipo pasa a estar debajo de Funcion y fuera de "A) Datos
+			// Personales del Empleado", igual que en la vista. Antes salia como un renglon mas del
+			// bloque A, despues de Region / Area.
+			_contenido.push({
+				text: "Tipo: " + datosAgente.tipoHabilitacion,
+				style: 'itemsColumn'
+			});
+			// FIN MOD TRNS #PT22.1
 			_contenido.push({
 				text: "\n" + "A) Datos Personales del Empleado:",
 				style: 'title'
@@ -197,8 +205,11 @@ sap.ui.define(["transener/GestionHabilitaciones/utils/FormatHelper",
 					"Doc. de Identidad: " + datosAgente.personalDNI + "\n" +
 					// INI MOD TRNS #PT-99
 					// "Region / Area: " + datosAgente.personaRegArea + "\n",
-					"Region / Area: " + datosAgente.personaRegArea + "\n" +
-					"Tipo: " + datosAgente.tipoHabilitacion + "\n",
+					// INI MOD TRNS #PT22.1 - el Tipo se movio arriba, debajo de Funcion
+					// "Region / Area: " + datosAgente.personaRegArea + "\n" +
+					// "Tipo: " + datosAgente.tipoHabilitacion + "\n",
+					"Region / Area: " + datosAgente.personaRegArea + "\n",
+					// FIN MOD TRNS #PT22.1
 					// FIN MOD TRNS #PT-99
 				style: 'itemsColumn'
 			});
